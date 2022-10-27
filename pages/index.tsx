@@ -1,27 +1,20 @@
-import type { NextPage } from "next";
+import Contact from "../components/Contact/Contact";
 import Head from "next/head";
 import Hero from "../components/Hero/Hero";
-import Slider from "../components/Slider/Slider";
-import { SliderData } from "../components/Slider/SliderData";
-import Instagram from "../components/InstagramGallery/Instagram";
-import Portfolio from "../components/Portfolio/Portfolio";
-import Contact from "../components/Contact/Contact";
+import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Keep moving</title>
+        <title>Dippies Reborn</title>
         <meta
           name="description"
-          content="Created as template for future work"
+          content="A path forward"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Hero heading="Let's go jogging" message="Find your road" />
-      <Slider slides={SliderData} />
-      <Instagram />
-      <Portfolio />
+      <Hero heading="Dippies Reborn" message="Dippies to the nippies" />
       <Contact />
     </>
   );

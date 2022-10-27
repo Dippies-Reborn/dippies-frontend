@@ -1,6 +1,7 @@
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import React, { useEffect, useState } from "react";
+
+import Link from "next/link";
 
 const NavBar = () => {
   const [nav, setNav] = useState(false);
@@ -32,18 +33,12 @@ const NavBar = () => {
       <div className="max-w-[1240px] m-auto flex justify-between items-center p-4 text-white">
         <Link href="/">
           <h1 style={{ color: `${textColor}` }} className="font-bold text-4xl">
-            MK
+            Dippies Reborn
           </h1>
         </Link>
         <ul style={{ color: `${textColor}` }} className="hidden sm:flex">
           <li className="p-4">
             <Link href="/">Home</Link>
-          </li>
-          <li className="p-4">
-            <Link href="/#gallery">Gallery</Link>
-          </li>
-          <li className="p-4">
-            <Link href="/#portfolio">My roads</Link>
           </li>
           <li className="p-4">
             <Link href="/#contact">Contact</Link>
