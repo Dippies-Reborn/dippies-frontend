@@ -1,7 +1,8 @@
-import Image from "next/image";
-import React, { useState } from "react";
-import { SliderData } from "./SliderData";
 import { FaArrowCircleLeft, FaArrowCircleRight } from "react-icons/fa";
+import React, { useState } from "react";
+
+import Image from "next/image";
+import { SliderData } from "./SliderData";
 
 interface Props {
   slides: any;
@@ -45,7 +46,6 @@ const Slider = ({ slides }: Props) => {
                   alt="/"
                   width="1440"
                   height="600"
-                  objectFit="cover"
                 />
               )}
               <FaArrowCircleRight
