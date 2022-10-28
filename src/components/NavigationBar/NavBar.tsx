@@ -2,6 +2,8 @@ import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import React, { useEffect, useState } from "react";
 
 import Link from "next/link";
+import { SelectAndConnectWalletButton } from "../SelectAndConnectWalletButton";
+import { WalletConnectButton } from "@solana/wallet-adapter-react-ui";
 
 const NavBar = () => {
   const [nav, setNav] = useState(false);
@@ -43,6 +45,9 @@ const NavBar = () => {
           <li className="p-4">
             <Link href="/#contact">Contact</Link>
           </li>
+          <li>
+            <SelectAndConnectWalletButton />
+          </li>
         </ul>
 
         {/* Mobile Button */}
@@ -72,19 +77,10 @@ const NavBar = () => {
               onClick={handleNav}
               className="p-4 text-4xl hover:text-gray-500"
             >
-              <Link href="/#gallery">Gallery</Link>
-            </li>
-            <li
-              onClick={handleNav}
-              className="p-4 text-4xl hover:text-gray-500"
-            >
-              <Link href="/#portfolio">My roads</Link>
-            </li>
-            <li
-              onClick={handleNav}
-              className="p-4 text-4xl hover:text-gray-500"
-            >
               <Link href="/#contact">Contact</Link>
+            </li>
+            <li>
+              <SelectAndConnectWalletButton />
             </li>
           </ul>
         </div>
