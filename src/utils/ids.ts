@@ -2,7 +2,9 @@ import { PublicKey } from "@solana/web3.js";
 
 export type StringPublicKey = string;
 
-export const DIPPIES_KEY = PublicKey.default;
+export const DIPPIES_KEY = new PublicKey(
+  "3h2CFnu8w7NRemnX9ybVeXsXAP3agkMuC1Kz8TnERYUi"
+);
 
 export const OG_DIPPIES_MINT = new PublicKey(
   "318p2nhXSiKSPhsQhCtBL1fXNgjUUGPAXG5dbQqSCEpw"
