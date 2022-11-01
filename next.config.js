@@ -4,8 +4,9 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: ["images.unsplash.com"],
-    unoptimized: true
+    unoptimized: true,
   },
+  eslint: { ignoreDuringBuilds: true },
 };
 
 module.exports = nextConfig;
