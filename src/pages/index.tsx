@@ -1,5 +1,4 @@
 import Contact from "../components/Contact/Contact";
-import { Disentangler } from "../components/Entangler/Disentangler";
 import { Entangler } from "../components/Entangler/Entangler";
 import Head from "next/head";
 import Hero from "../components/Hero/Hero";
@@ -15,7 +14,7 @@ const Home: NextPage = () => {
       </Head>
       <Hero heading="Dippies Reborn" message="Dippies to the nippies" />
       <Entangler />
-      <Disentangler />
+      <Entangler disentangle />
       <Contact />
     </>
   );

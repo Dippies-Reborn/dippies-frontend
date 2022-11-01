@@ -5,7 +5,7 @@ const contact = () => {
   return (
     <div id="contact" className="max-w-[1240px] m-auto p-4 h-screen">
       <a href="https://discord.gg/XNmzNsNFhs">
-        <div className="btn btn-lg flex flex-row gap-2 w-fit text-2xl font-bold text-center p-4">
+        <div className="btn btn-lg flex flex-row gap-2 w-fit mx-auto text-2xl font-bold text-center p-4">
           Go to discord <FaDiscord className="w-8 h-8" />
         </div>
       </a>

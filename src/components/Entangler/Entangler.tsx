@@ -1,10 +1,14 @@
 import { DIPPIES_DAO_KEY, DIPPIES_KEY } from "../../utils/ids";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import {
+  ENTANGLEMENT_PAIR_SEED,
+  EntanglerWrapper,
+} from "../../programs/entangler";
+import { PublicKey, Transaction, VersionedMessage } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { PROGRAM_ID as ENTANGLER_ID } from "../../programs/entangler/programId";
-import { EntanglerWrapper } from "../../programs/entangler";
+import { EntangledPair } from "../../programs/entangler/accounts/EntangledPair";
 import { FaCheckCircle } from "react-icons/fa";
 import { Nft } from "@metaplex-foundation/js";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
@@ -18,110 +22,119 @@ const COLLECTION_SEED = "collection";
 const COLLECTION_MINT_SEED = "collection-mint";
 const ENTANGLEMENT_MINT_SEED = "entanglement-mint";
 
-export const Entangler = () => {
+export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
   const { connection } = useConnection();
-  const { tokens, entangledTokens, fetchTokens } = useUserNfts();
+  const {
+    tokens: originalTokens,
+    entangledTokens,
+    fetchTokens,
+  } = useUserNfts();
+  const tokens = disentangle ? entangledTokens : originalTokens;
   const wallet = useWallet();
 
   const [isEntangling, setIsEntangling] = useState(false);
   const [entangledPair, setEntangledPair] = useState(
     localStorage.getItem("entangledPair") || ""
   );
-  const [token, setToken] = useState<Nft>();
-
-  const anchorWallet = useMemo(() => {
-    if (
-      !wallet ||
-      !wallet.publicKey ||
-      !wallet.signAllTransactions ||
-      !wallet.signTransaction
-    ) {
-      return;
-    }
-
-    return {
-      publicKey: wallet.publicKey,
-      signAllTransactions: wallet.signAllTransactions,
-      signTransaction: wallet.signTransaction,
-    } as Wallet;
-  }, [wallet]);
-
-  useEffect(() => {
-    (async () => {
-      if (!anchorWallet) {
-        return;
-      }
-    })();
-  }, [anchorWallet]);
+  const [selectedTokens, setSelectedTokens] = useState<Nft[]>([]);
 
   const handleEntangle = async () => {
-    if (!wallet || !token || !connection) {
+    if (!wallet || selectedTokens.length == 0 || !connection) {
       return;
     }
 
     setIsEntangling(true);
 
+    const txs = [];
     try {
-      const entangler = new EntanglerWrapper(
-        token.address,
-        wallet.publicKey!,
-        DIPPIES_KEY,
-        DIPPIES_DAO_KEY,
-        500
-      );
-
-      const [entangledMint] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(ENTANGLEMENT_MINT_SEED),
-          DIPPIES_KEY.toBuffer(),
-          token.address.toBuffer(),
-        ],
-        ENTANGLER_ID
-      );
-
       const tx = new Transaction(await connection.getLatestBlockhash());
 
-      // Find the pair
-      try {
-        const entangledMintInfo = await getMint(connection, entangledMint);
-        console.log("Entangled Mint:", entangledMintInfo.address.toString());
-      } catch (e) {
-        console.log("Pair not created");
-        tx.add(entangler.instruction.initializePair(token.address));
-      }
+      for (const token of selectedTokens) {
+        const entangler = new EntanglerWrapper(
+          token.address,
+          wallet.publicKey!,
+          DIPPIES_KEY,
+          DIPPIES_DAO_KEY,
+          500
+        );
 
-      tx.add(entangler.instruction.entangle(token.address));
-      console.log(tx.instructions[0].keys.map((e) => e.pubkey.toString()));
+        const [entangledMint] = PublicKey.findProgramAddressSync(
+          [
+            Buffer.from(ENTANGLEMENT_MINT_SEED),
+            DIPPIES_KEY.toBuffer(),
+            token.address.toBuffer(),
+          ],
+          ENTANGLER_ID
+        );
+
+        if (!disentangle) {
+          // Find the pair
+          try {
+            const entangledMintInfo = await getMint(connection, entangledMint);
+            console.log(
+              "Entangled Mint:",
+              entangledMintInfo.address.toString()
+            );
+          } catch (e) {
+            console.log("Pair not created");
+            tx.add(entangler.instruction.initializePair(token.address));
+          }
+
+          tx.add(entangler.instruction.entangle(token.address));
+        } else {
+          const [entangledPairKey] = PublicKey.findProgramAddressSync(
+            [Buffer.from(ENTANGLEMENT_PAIR_SEED), token.address.toBuffer()],
+            ENTANGLER_ID
+          );
+          const entangledPair = await EntangledPair.fetch(
+            connection,
+            entangledPairKey
+          );
+          tx.add(
+            entangler.instruction.disentangle(entangledPair?.originalMint!)
+          );
+        }
+
+        txs.push(tx);
+      }
 
       await connection.confirmTransaction(
         await wallet.sendTransaction(tx, connection)
       );
 
       fetchTokens();
-      setToken(undefined);
+      setSelectedTokens([]);
     } catch (e) {
-      console.log("Entangle failed:", e);
+      console.log("Entanglement failed:", e);
     } finally {
       setIsEntangling(false);
     }
   };
 
-  console.log(tokens, entangledTokens);
+  console.log(tokens, selectedTokens);
   return (
     <div className="rounded-xl bg-base-200 m-5 shadow-xl border-2">
-      {token ? (
+      {selectedTokens.length > 0 ? (
         <div className="flex flex-col gap-3 bg-base-200 max-w-xl mx-auto rounded-lg p-5 justify-center">
-          <h4 className="text-3xl text-center">Entangle {token.name}</h4>
+          <h4 className="text-3xl text-center">
+            {disentangle ? "Disentangle" : "Entangle"} {selectedTokens.length}{" "}
+            Dippies
+          </h4>
           <div className="w-56 mx-auto">
-            <img className="w-56 rounded-md" src={token.json?.image} />
+            <div className="stack">
+              {selectedTokens.map((token) => (
+                <img className="w-56 rounded-md" src={token.json?.image} />
+              ))}
+            </div>
           </div>
           <div
             className={`btn btn-lg btn-primary flex flex-row gap-5 ${
-              token ? "" : "btn-disabled"
+              selectedTokens.length !== 0 ? "" : "btn-disabled"
             } ${isEntangling ? "loading btn-disabled" : ""}`}
             onClick={handleEntangle}
           >
-            Entangle
+            {disentangle ? "Disentangle" : "Entangle"}
+            <span className="text-xl">{selectedTokens.length}</span>
             <PaperAirplaneIcon className="w-8 h-8" />
           </div>
 
@@ -135,38 +148,46 @@ export const Entangler = () => {
           </span>
         </div>
       ) : null}
-      {tokens ? (
+      {tokens && tokens.length > 0 ? (
         <div className="flex flex-col p-5">
-          {tokens.length > 0 ? (
-            <span className="text-center text-3xl">
-              Select a Dippie to entangle
-            </span>
-          ) : (
-            <span className="text-center text-3xl">No Dippies to entangle</span>
-          )}
+          <span className="text-center text-3xl">
+            Select up to 2 Dippies to {disentangle ? "disentangle" : "entangle"}
+          </span>
           <div className="flex flex-wrap">
-            {tokens.map((e) => (
+            {tokens.map((token) => (
               <div
-                key={e.address.toString()}
+                key={token.address.toString()}
                 className={`m-3 static flex flex-col w-56 rounded-lg shadow-xl border-2 ${
-                  e === token ? "border-accent" : ""
+                  selectedTokens.includes(token) ? "border-accent" : ""
                 }`}
-                onClick={() => setToken(e)}
+                onClick={() =>
+                  !selectedTokens.includes(token)
+                    ? selectedTokens.length < 2
+                      ? setSelectedTokens((old) => [...old, token])
+                      : null
+                    : setSelectedTokens((old) =>
+                        old.filter((e) => !e.address.equals(token.address))
+                      )
+                }
               >
-                {token === e ? (
+                {selectedTokens.includes(token) ? (
                   <div className="absolute p-1">
                     <FaCheckCircle className="text-accent w-8 h-8" />
                   </div>
                 ) : null}
-                <img className="w-56 rounded-t-md" src={e.json?.image} />
+                <img className="w-56 rounded-t-md" src={token.json?.image} />
                 <span className="text-xl font-bold text-center p-3">
-                  {e.name}
+                  {token.name}
                 </span>
               </div>
             ))}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <span className="text-center text-3xl p-5">
+          No Dippies to {disentangle ? "disentangle" : "entangle"}
+        </span>
+      )}
     </div>
   );
 };
