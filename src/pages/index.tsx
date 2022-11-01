@@ -1,4 +1,6 @@
 import Contact from "../components/Contact/Contact";
+import { Disentangler } from "../components/Entangler/Disentangler";
+import { Entangler } from "../components/Entangler/Entangler";
 import Head from "next/head";
 import Hero from "../components/Hero/Hero";
 import type { NextPage } from "next";
@@ -8,13 +10,12 @@ const Home: NextPage = () => {
     <>
       <Head>
         <title>Dippies Reborn</title>
-        <meta
-          name="description"
-          content="A path forward"
-        />
+        <meta name="description" content="A path forward" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Hero heading="Dippies Reborn" message="Dippies to the nippies" />
+      <Entangler />
+      <Disentangler />
       <Contact />
     </>
   );

@@ -1,37 +1,14 @@
+import { FaDiscord } from "react-icons/fa";
 import React from "react";
 
 const contact = () => {
   return (
     <div id="contact" className="max-w-[1240px] m-auto p-4 h-screen">
-      <h1 className="text-2xl font-bold text-center p-4">
-        Send me a 🏃 message
-      </h1>
-      <form className="max-w-[600px] m-auto">
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            className="border shadow-lg p-3"
-            type="text"
-            placeholder="Name"
-          />
-          <input
-            className="border shadow-lg p-3"
-            type="email"
-            placeholder="Email"
-          />
+      <a href="https://discord.gg/XNmzNsNFhs">
+        <div className="btn btn-lg flex flex-row gap-2 w-fit text-2xl font-bold text-center p-4">
+          Go to discord <FaDiscord className="w-8 h-8" />
         </div>
-        <input
-          className="border shadow-lg p-3 w-full my-2"
-          type="text"
-          placeholder="Subject"
-        />
-        <textarea
-          className="border shadow-lg p-3 w-full"
-          cols={30}
-          rows={10}
-          placeholder="Message"
-        ></textarea>
-        <button className="border shadow-lg p-3 w-full mt-2">Submit</button>
-      </form>
+      </a>
     </div>
   );
 };

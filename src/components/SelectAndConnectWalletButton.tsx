@@ -1,11 +1,8 @@
 import { FC, useEffect } from "react";
-import {
-  WalletMultiButton,
-  useWalletModal,
-} from "@solana/wallet-adapter-react-ui";
 
 import { shortAddress } from "../utils";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 type Props = {};
 
