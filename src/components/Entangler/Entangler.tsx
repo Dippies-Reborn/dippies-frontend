@@ -3,9 +3,8 @@ import {
   ENTANGLEMENT_PAIR_SEED,
   EntanglerWrapper,
 } from "../../programs/entangler";
-import { PublicKey, Transaction, VersionedMessage } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useEffect, useMemo, useState } from "react";
 
 import { PROGRAM_ID as ENTANGLER_ID } from "../../programs/entangler/programId";
 import { EntangledPair } from "../../programs/entangler/accounts/EntangledPair";
@@ -13,9 +12,9 @@ import { FaCheckCircle } from "react-icons/fa";
 import { Nft } from "@metaplex-foundation/js";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
 import React from "react";
-import { Wallet } from "@project-serum/anchor";
 import { getMint } from "@solana/spl-token";
 import { toast } from "react-toastify";
+import { useState } from "react";
 import useUserNfts from "../../hooks/useUserNfts";
 
 const AUTHORITY_SEED = "authority";
@@ -47,9 +46,10 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
     setIsEntangling(true);
 
     try {
-      const tx = new Transaction(await connection.getLatestBlockhash());
+      const txs = [];
 
       for (const token of selectedTokens) {
+        const tx = new Transaction(await connection.getLatestBlockhash());
         const entangler = new EntanglerWrapper(
           token.address,
           wallet.publicKey!,
@@ -70,13 +70,8 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
         if (!disentangle) {
           // Find the pair
           try {
-            const entangledMintInfo = await getMint(connection, entangledMint);
-            console.log(
-              "Entangled Mint:",
-              entangledMintInfo.address.toString()
-            );
+            await getMint(connection, entangledMint);
           } catch (e) {
-            console.log("Pair not created");
             tx.add(entangler.instruction.initializePair(token.address));
           }
 
@@ -94,11 +89,19 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
             entangler.instruction.disentangle(entangledPair?.originalMint!)
           );
         }
-      }
-      console.log("ok");
 
-      await connection.confirmTransaction(
-        await wallet.sendTransaction(tx, connection, { skipPreflight: true })
+        tx.feePayer = wallet.publicKey!;
+        txs.push(tx);
+      }
+
+      const signed = await wallet.signAllTransactions!(txs);
+      await Promise.all(
+        signed.map(
+          async (tx) =>
+            await connection.confirmTransaction(
+              await connection.sendRawTransaction(tx.serialize())
+            )
+        )
       );
 
       fetchTokens();
@@ -111,7 +114,9 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
     }
   };
 
-  console.log(tokens, selectedTokens);
+  console.log("OG Dippies", originalTokens);
+  console.log("Entangled Dippies", entangledTokens);
+  console.log("Selected Dippies", selectedTokens);
   return (
     <div className="rounded-xl bg-base-200 m-5 shadow-xl border-2">
       {selectedTokens.length > 0 ? (
@@ -122,8 +127,8 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
           </h4>
           <div className="w-56 mx-auto">
             <div className="stack">
-              {selectedTokens.map((token) => (
-                <img className="w-56 rounded-md" src={token.json?.image} />
+              {selectedTokens.map((token, i) => (
+                <img className={`w-56 rounded-md`} src={token.json?.image} />
               ))}
             </div>
           </div>
@@ -151,20 +156,18 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
       {tokens && tokens.length > 0 ? (
         <div className="flex flex-col p-5">
           <span className="text-center text-3xl">
-            Select up to 2 Dippies to {disentangle ? "disentangle" : "entangle"}
+            Select Dippies to {disentangle ? "disentangle" : "entangle"}
           </span>
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap justify-center">
             {tokens.map((token) => (
               <div
                 key={token.address.toString()}
-                className={`m-3 static flex flex-col w-56 rounded-lg shadow-xl border-2 ${
+                className={`m-3 static flex flex-col w-48 rounded-lg shadow-xl border-2 ${
                   selectedTokens.includes(token) ? "border-accent" : ""
                 }`}
                 onClick={() =>
                   !selectedTokens.includes(token)
-                    ? selectedTokens.length < 2
-                      ? setSelectedTokens((old) => [...old, token])
-                      : null
+                    ? setSelectedTokens((old) => [...old, token])
                     : setSelectedTokens((old) =>
                         old.filter((e) => !e.address.equals(token.address))
                       )
