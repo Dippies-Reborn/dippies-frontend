@@ -8,11 +8,11 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Dippies Reborn</title>
+        <title>Dippies Club</title>
         <meta name="description" content="A path forward" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Hero heading="Dippies Reborn" message="Dippies to the nippies" />
+      <Hero heading="Dippies Club" message="Dippies to the nippies" />
       <Entangler />
       <Entangler disentangle />
       <Contact />

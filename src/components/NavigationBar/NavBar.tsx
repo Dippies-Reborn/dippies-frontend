@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { SelectAndConnectWalletButton } from "../SelectAndConnectWalletButton";
-import { WalletConnectButton } from "@solana/wallet-adapter-react-ui";
 
 const NavBar = () => {
   const [nav, setNav] = useState(false);
@@ -35,7 +34,7 @@ const NavBar = () => {
       <div className="max-w-[1240px] m-auto flex justify-between items-center p-4 text-white">
         <Link href="/">
           <h1 style={{ color: `${textColor}` }} className="font-bold text-4xl">
-            Dippies Reborn
+            Dippies Club
           </h1>
         </Link>
         <ul style={{ color: `${textColor}` }} className="hidden sm:flex">
