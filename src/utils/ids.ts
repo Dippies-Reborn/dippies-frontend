@@ -3,7 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 export type StringPublicKey = string;
 
 export const DIPPIES_KEY = new PublicKey(
-  "3h2CFnu8w7NRemnX9ybVeXsXAP3agkMuC1Kz8TnERYUi"
+  "UuGEwN9aeh676ufphbavfssWVxH7BJCqacq1RYhco8e"
 );
 
 export const OG_DIPPIES_MINT = new PublicKey(
@@ -11,7 +11,7 @@ export const OG_DIPPIES_MINT = new PublicKey(
 );
 
 export const NEW_DIPPIES_MINT = new PublicKey(
-  "HqMgMefTNDeMtNTd7XsLEKWq3kbDqoVnyHpKZAaBqo7c"
+  "C2cD56APtfp6PhZr2Wm6X19EnyxaNFtYxnCETURLt1SA"
 );
 
 export const DIPPIES_DAO_KEY = new PublicKey(

@@ -3,6 +3,7 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import NavBar from "../components/NavigationBar/NavBar";
+import { ToastContainer } from "react-toastify";
 import { UserNftsProvider } from "../contexts/UserNfts";
 import dynamic from "next/dynamic";
 
@@ -23,6 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <UserNftsProvider>
           <NavBar />
           <Component {...pageProps} />
+          <ToastContainer />
         </UserNftsProvider>
       </WalletProvider>
     </ConnectionProvider>

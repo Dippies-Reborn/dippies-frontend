@@ -15,6 +15,7 @@ import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
 import React from "react";
 import { Wallet } from "@project-serum/anchor";
 import { getMint } from "@solana/spl-token";
+import { toast } from "react-toastify";
 import useUserNfts from "../../hooks/useUserNfts";
 
 const AUTHORITY_SEED = "authority";
@@ -45,7 +46,6 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
 
     setIsEntangling(true);
 
-    const txs = [];
     try {
       const tx = new Transaction(await connection.getLatestBlockhash());
 
@@ -94,18 +94,18 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
             entangler.instruction.disentangle(entangledPair?.originalMint!)
           );
         }
-
-        txs.push(tx);
       }
+      console.log("ok");
 
       await connection.confirmTransaction(
-        await wallet.sendTransaction(tx, connection)
+        await wallet.sendTransaction(tx, connection, { skipPreflight: true })
       );
 
       fetchTokens();
       setSelectedTokens([]);
     } catch (e) {
-      console.log("Entanglement failed:", e);
+      console.log(e);
+      toast(`Entanglement failed: ${e}`);
     } finally {
       setIsEntangling(false);
     }

@@ -1,6 +1,7 @@
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram } from "@solana/web3.js";
 import {
@@ -149,14 +150,11 @@ export class EntanglerWrapper {
         ],
         METADATA_PROGRAM_ID
       )[0];
-      const originalMintEscrow = PublicKey.findProgramAddressSync(
-        [
-          this.entanglerAuthority.toBuffer(),
-          TOKEN_PROGRAM_ID.toBuffer(),
-          originalMint.toBuffer(),
-        ],
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      )[0];
+      const originalMintEscrow = getAssociatedTokenAddressSync(
+        originalMint,
+        this.entanglerAuthority,
+        true
+      );
 
       const [entangledMint] = PublicKey.findProgramAddressSync(
         [
@@ -178,14 +176,11 @@ export class EntanglerWrapper {
         ],
         METADATA_PROGRAM_ID
       )[0];
-      const entangledMintEscrow = PublicKey.findProgramAddressSync(
-        [
-          this.entanglerAuthority.toBuffer(),
-          TOKEN_PROGRAM_ID.toBuffer(),
-          entangledMint.toBuffer(),
-        ],
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      )[0];
+      const entangledMintEscrow = getAssociatedTokenAddressSync(
+        entangledMint,
+        this.entanglerAuthority,
+        true
+      );
 
       return initializePair({
         signer: this.signer,
