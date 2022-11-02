@@ -7,11 +7,14 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Dippies Club</title>
+        <title>Dippies Club - Entangle</title>
         <meta name="description" content="A path forward" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Hero heading="Dippies Club" message="Dippies to the nippies" />
+      <div className="mt-24">
+        <Entangler />
+        <Entangler disentangle />
+      </div>
     </>
   );
 };

@@ -125,10 +125,13 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
             {disentangle ? "Disentangle" : "Entangle"} {selectedTokens.length}{" "}
             Dippies
           </h4>
-          <div className="w-56 mx-auto">
+          <div className="w-32 sm:w-48 mx-auto">
             <div className="stack">
               {selectedTokens.map((token, i) => (
-                <img className={`w-56 rounded-md`} src={token.json?.image} />
+                <img
+                  className={`w-32 sm:w-48 rounded-md`}
+                  src={token.json?.image}
+                />
               ))}
             </div>
           </div>
@@ -162,7 +165,7 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
             {tokens.map((token) => (
               <div
                 key={token.address.toString()}
-                className={`m-3 static flex flex-col w-48 rounded-lg shadow-xl border-2 ${
+                className={`m-3 static flex flex-col w-32 sm:w-48 rounded-lg shadow-xl border-2 ${
                   selectedTokens.includes(token) ? "border-accent" : ""
                 }`}
                 onClick={() =>

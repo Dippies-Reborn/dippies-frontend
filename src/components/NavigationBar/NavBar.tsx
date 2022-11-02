@@ -4,6 +4,11 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { SelectAndConnectWalletButton } from "../SelectAndConnectWalletButton";
 
+const navItems = [
+  { name: "Home", href: "/" },
+  { name: "Entangle", href: "/entangle" },
+];
+
 const NavBar = () => {
   const [nav, setNav] = useState(false);
   const [color, setColor] = useState("transparent");
@@ -38,12 +43,11 @@ const NavBar = () => {
           </h1>
         </Link>
         <ul style={{ color: `${textColor}` }} className="hidden sm:flex">
-          <li className="p-4">
-            <Link href="/">Home</Link>
-          </li>
-          <li className="p-4">
-            <Link href="/#contact">Contact</Link>
-          </li>
+          {navItems.map((e) => (
+            <li className="p-4">
+              <Link href={e.href}>{e.name}</Link>
+            </li>
+          ))}
           <li>
             <SelectAndConnectWalletButton />
           </li>
@@ -66,18 +70,14 @@ const NavBar = () => {
           }
         >
           <ul>
-            <li
-              onClick={handleNav}
-              className="p-4 text-4xl hover:text-gray-500"
-            >
-              <Link href="/">Home</Link>
-            </li>
-            <li
-              onClick={handleNav}
-              className="p-4 text-4xl hover:text-gray-500"
-            >
-              <Link href="/#contact">Contact</Link>
-            </li>
+            {navItems.map((e) => (
+              <li
+                onClick={handleNav}
+                className="p-4 text-4xl hover:text-gray-500"
+              >
+                <Link href={e.href}>{e.name}</Link>
+              </li>
+            ))}
             <li>
               <SelectAndConnectWalletButton />
             </li>
