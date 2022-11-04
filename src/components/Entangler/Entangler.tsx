@@ -33,9 +33,6 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
   const wallet = useWallet();
 
   const [isEntangling, setIsEntangling] = useState(false);
-  const [entangledPair, setEntangledPair] = useState(
-    localStorage.getItem("entangledPair") || ""
-  );
   const [selectedTokens, setSelectedTokens] = useState<Nft[]>([]);
 
   const handleEntangle = async () => {
@@ -99,7 +96,9 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
         signed.map(
           async (tx) =>
             await connection.confirmTransaction(
-              await connection.sendRawTransaction(tx.serialize())
+              await connection.sendRawTransaction(tx.serialize(), {
+                skipPreflight: true,
+              })
             )
         )
       );
@@ -145,15 +144,6 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
             <span className="text-xl">{selectedTokens.length}</span>
             <PaperAirplaneIcon className="w-8 h-8" />
           </div>
-
-          <span className="block mt-2">
-            {!entangledPair ? (
-              ""
-            ) : (
-              <h5 color="text.primary">Entangled Pair swap complete!</h5>
-            )}
-            <p>{entangledPair}</p>
-          </span>
         </div>
       ) : null}
       {tokens && tokens.length > 0 ? (
