@@ -3,12 +3,14 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import NavBar from "../components/NavigationBar/NavBar";
+import { RegisteredCollectionsProvider } from "../contexts/RegisteredCollection";
 import { ToastContainer } from "react-toastify";
 import { UserNftsProvider } from "../contexts/UserNfts";
 import dynamic from "next/dynamic";
 
 const endpoint =
-  "https://solana-mainnet.g.alchemy.com/v2/-Rlnd-xRdEeZJyZZ2APT7J6-VVCvsx2E";
+  // "https://solana-mainnet.g.alchemy.com/v2/-Rlnd-xRdEeZJyZZ2APT7J6-VVCvsx2E";
+  "https://rpc.helius.xyz/?api-key=d1593552-6d2e-4ef5-b897-856c3d96c316";
 
 const WalletProvider = dynamic(
   () => import("../contexts/ClientWalletProvider"),
@@ -22,9 +24,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider>
         <UserNftsProvider>
-          <NavBar />
-          <Component {...pageProps} />
-          <ToastContainer />
+          <RegisteredCollectionsProvider>
+            <NavBar />
+            <Component {...pageProps} />
+            <ToastContainer />
+          </RegisteredCollectionsProvider>
         </UserNftsProvider>
       </WalletProvider>
     </ConnectionProvider>
