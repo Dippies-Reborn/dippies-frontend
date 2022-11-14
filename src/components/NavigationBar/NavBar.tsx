@@ -6,7 +6,7 @@ import { SelectAndConnectWalletButton } from "../SelectAndConnectWalletButton";
 
 const navItems = [
   { name: "Home", href: "/" },
-  { name: "Entangle", href: "/entangle" },
+  { name: "Collections", href: "/collections" },
 ];
 
 const NavBar = () => {

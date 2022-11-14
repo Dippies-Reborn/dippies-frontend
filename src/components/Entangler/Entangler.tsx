@@ -27,6 +27,7 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
   const {
     tokens: originalTokens,
     entangledTokens,
+    isFetching,
     fetchTokens,
   } = useUserNfts();
   const tokens = disentangle ? entangledTokens : originalTokens;
@@ -113,14 +114,11 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
     }
   };
 
-  console.log("OG Dippies", originalTokens);
-  console.log("Entangled Dippies", entangledTokens);
-  console.log("Selected Dippies", selectedTokens);
   return (
-    <div className="rounded-xl bg-base-200 m-5 shadow-xl border-2">
+    <div className="rounded-xl bg-base-200 m-5 shadow-xl">
       {selectedTokens.length > 0 ? (
         <div className="flex flex-col gap-3 bg-base-200 max-w-xl mx-auto rounded-lg p-5 justify-center">
-          <h4 className="text-3xl text-center">
+          <h4 className="text-3xl font-bold text-center">
             {disentangle ? "Disentangle" : "Entangle"} {selectedTokens.length}{" "}
             Dippies
           </h4>
@@ -148,15 +146,15 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
       ) : null}
       {tokens && tokens.length > 0 ? (
         <div className="flex flex-col p-5">
-          <span className="text-center text-3xl">
+          <span className="text-center text-3xl font-bold">
             Select Dippies to {disentangle ? "disentangle" : "entangle"}
           </span>
           <div className="flex flex-wrap justify-center">
             {tokens.map((token) => (
               <div
                 key={token.address.toString()}
-                className={`m-3 static flex flex-col w-32 sm:w-48 rounded-lg shadow-xl border-2 ${
-                  selectedTokens.includes(token) ? "border-accent" : ""
+                className={`m-2 static flex flex-col w-32 sm:w-48 rounded-lg shadow-xl bg-neutral ${
+                  selectedTokens.includes(token) ? "border-2 border-accent" : ""
                 }`}
                 onClick={() =>
                   !selectedTokens.includes(token)
@@ -172,7 +170,7 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
                   </div>
                 ) : null}
                 <img className="w-56 rounded-t-md" src={token.json?.image} />
-                <span className="text-xl font-bold text-center p-3">
+                <span className="text-xl font-bold text-center p-3 text-neutral-content">
                   {token.name}
                 </span>
               </div>
@@ -180,9 +178,18 @@ export const Entangler = ({ disentangle }: { disentangle?: boolean }) => {
           </div>
         </div>
       ) : (
-        <span className="text-center text-3xl p-5">
-          No Dippies to {disentangle ? "disentangle" : "entangle"}
-        </span>
+        <>
+          {isFetching ? (
+            <div className="text-center text-3xl p-5">
+              <span>Fetching tokens...</span>
+              <progress className="progress"></progress>
+            </div>
+          ) : (
+            <span className="text-center font-bold text-3xl p-5">
+              No tokens to {disentangle ? "disentangle" : "entangle"}
+            </span>
+          )}
+        </>
       )}
     </div>
   );

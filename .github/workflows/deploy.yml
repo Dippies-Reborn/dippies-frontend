@@ -25,6 +25,7 @@ jobs:
           npm i --legacy-peer-deps
           npm run build
           npm run export
+          echo 'dippies.club' > ./out/CNAME
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
