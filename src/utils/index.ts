@@ -1,3 +1,4 @@
+import { BN } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 
 export const shortAddress = (key: PublicKey) => {
@@ -7,4 +8,8 @@ export const shortAddress = (key: PublicKey) => {
     "..." +
     fullKey.substring(fullKey.length - 4, fullKey.length)
   );
+};
+
+export const formatBn = (n: BN) => {
+  return n.toNumber();
 };

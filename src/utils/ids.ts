@@ -19,6 +19,14 @@ export const DIPPIES_DAO_KEY = new PublicKey(
   "3h2CFnu8w7NRemnX9ybVeXsXAP3agkMuC1Kz8TnERYUi"
 );
 
+export const DIPPIES_ROOT = new PublicKey(
+  "21WkNFjxuUi3zNA7N2GDJRqmmcHh84vDHo7XczSS2rV8"
+);
+
+export const DIPPIES_TOKEN = new PublicKey(
+  "DjPH6mVyLgeLc3dEF4bFTdLLzYHgA2gNYVAg6D4vPaxh"
+);
+
 export const CANDY_MACHINE_ID = new PublicKey(
   "cndyAnrLdpjq1Ssp1z8xxDsB8dxe7u4HL5Nxi2K5WXZ"
 );

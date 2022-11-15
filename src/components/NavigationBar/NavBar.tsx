@@ -7,6 +7,7 @@ import { SelectAndConnectWalletButton } from "../SelectAndConnectWalletButton";
 const navItems = [
   { name: "Home", href: "/" },
   { name: "Collections", href: "/collections" },
+  { name: "DIP", href: "/dip" },
 ];
 
 const NavBar = () => {
@@ -44,7 +45,7 @@ const NavBar = () => {
         </Link>
         <ul style={{ color: `${textColor}` }} className="hidden sm:flex">
           {navItems.map((e) => (
-            <li className="p-4">
+            <li key={e.href} className="p-4">
               <Link href={e.href}>{e.name}</Link>
             </li>
           ))}
@@ -72,6 +73,7 @@ const NavBar = () => {
           <ul>
             {navItems.map((e) => (
               <li
+                key={e.href}
                 onClick={handleNav}
                 className="p-4 text-4xl hover:text-gray-500"
               >

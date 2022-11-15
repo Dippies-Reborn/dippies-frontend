@@ -13,7 +13,7 @@ import { Nft } from "@metaplex-foundation/js";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
 import React from "react";
 import { getMint } from "@solana/spl-token";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useState } from "react";
 import useUserNfts from "../../hooks/useUserNfts";
 
