@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@bundlr-network/client": "^0.9.0",
     "@heroicons/react": "^2.0.12",
     "@metaplex-foundation/js": "^0.17.4",
     "@metaplex-foundation/mpl-token-metadata": "^2.5.1",
@@ -22,11 +23,13 @@
     "@solana/web3.js": "^1.66.2",
     "@tailwindcss/typography": "^0.5.7",
     "daisyui": "^2.33.0",
+    "filereader-stream": "^2.0.0",
     "install": "^0.13.0",
     "next": "^13.0.0",
     "npm": "^8.19.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-dropzone": "^14.2.3",
     "react-hot-toast": "^2.4.0"
   },
   "devDependencies": {

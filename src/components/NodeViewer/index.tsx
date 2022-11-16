@@ -135,11 +135,15 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
                 {notes.map((note) => (
                   <NoteCard key={note.key.toString()} note={note} />
                 ))}
-                {Array(MAX_NOTES_PER_NODE - notes.length)
-                  .fill(0)
-                  .map((_, i) => (
-                    <CreateNoteButton key={`create-note-${i}`} node={node} />
-                  ))}
+                {node.children.length === 0 ? (
+                  Array(MAX_NOTES_PER_NODE - notes.length)
+                    .fill(0)
+                    .map((_, i) => (
+                      <CreateNoteButton key={`create-note-${i}`} node={node} />
+                    ))
+                ) : (
+                  <div>Can't create notes on nodes with children</div>
+                )}
               </div>
               <div className="btn btn-ghost w-fit mx-auto">
                 <BsThreeDots className="w-12 h-12 m-auto" />

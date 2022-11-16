@@ -1,31 +1,33 @@
 import * as anchor from "@project-serum/anchor";
 
-import { Node, Note } from "../programs/dippiesIndexProtocol/accounts";
+import { Node, Note, StakeAccount } from "../programs/dippiesIndexProtocol";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 
 import { NodeWithKey } from "./useTree";
 import { PublicKey } from "@solana/web3.js";
+import { TreeDeaStakeAccount } from "./../programs/dippiesIndexProtocol/stakeAccount";
 
 export interface NoteWithKey extends Note {
   key: PublicKey;
 }
 
-export default function useNote(noteKey: anchor.web3.PublicKey) {
+export default function useNote(note: NoteWithKey) {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
-  const [note, setNote] = useState<NoteWithKey>();
+  const [userStake, setUserStake] = useState<number>();
 
-  const fetchNote = async () => {
+  const fetchUserStake = async () => {
     if (!connection || !wallet?.publicKey) return;
 
-    const res = await Note.fetch(connection, noteKey);
+    const stakeKey = TreeDeaStakeAccount.key(note.key, wallet.publicKey);
+    const res = await StakeAccount.fetch(connection, stakeKey);
 
-    if (res) setNote({ ...res, key: noteKey } as any);
+    if (res) setUserStake({ ...res, key: stakeKey } as any);
   };
   useEffect(() => {
-    if (!note) fetchNote();
+    if (!note) fetchUserStake();
   }, [wallet?.publicKey, note]);
 
-  return { note };
+  return { userStake };
 }

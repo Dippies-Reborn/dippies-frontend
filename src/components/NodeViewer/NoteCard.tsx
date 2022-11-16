@@ -1,11 +1,17 @@
+import useNote, { NoteWithKey } from "../../hooks/useNote";
+
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { GiTwoCoins } from "react-icons/gi";
 import Image from "next/image";
 import Link from "next/link";
-import { NoteWithKey } from "../../hooks/useNote";
+import ManageStakeButton from "./ManageStakeButton";
 import React from "react";
 import { formatBn } from "../../utils";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default ({ note }: { note: NoteWithKey }) => {
+  const wallet = useWallet();
+  const { userStake } = useNote(note);
   return (
     <div className="w-64 bg-base-200 rounded-xl shadow-xl m-3 flex flex-col gap-2">
       <div>
@@ -19,9 +25,22 @@ export default ({ note }: { note: NoteWithKey }) => {
         <div className="flex flex-col gap-3">
           <div className="divider text-lg font-bold">{note.description}</div>
           <div className="flex flex-row justify-between">
-            <div className="font-bold">Total stake:</div>
-            <div>{formatBn(note.stake)}</div>
+            <div className="font-bold my-auto">Total stake:</div>
+            <div className="flex flex- gap-1">
+              <div className="my-auto font-bold">{formatBn(note.stake)}</div>
+            </div>
           </div>
+          {wallet.publicKey ? (
+            <>
+              <div className="flex flex-row justify-between">
+                <div className="font-bold my-auto">Your stake stake:</div>
+                <div className="flex flex- gap-1">
+                  <div className="my-auto font-bold">{userStake || 0}</div>
+                </div>
+              </div>
+              <ManageStakeButton note={note} userStake={userStake!} />
+            </>
+          ) : null}
           <div>
             <div className="font-bold">Tags:</div>
             <div className="flex flex-wrap gap-2">
