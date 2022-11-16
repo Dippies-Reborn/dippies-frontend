@@ -13,7 +13,9 @@ const TreePage: NextPage = () => {
     try {
       return new PublicKey(key);
     } catch {}
-  }, [key]);
+  }, [router]);
+
+  console.log(key);
 
   return (
     <>

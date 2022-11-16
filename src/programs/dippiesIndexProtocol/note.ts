@@ -1,15 +1,19 @@
 import * as anchor from "@project-serum/anchor";
 
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { NODE_SEED, ROOT_AUTHORITY_SEED, ROOT_SEED } from "./constants";
+import {
+  NODE_SEED,
+  NOTE_SEED,
+  ROOT_AUTHORITY_SEED,
+  ROOT_SEED,
+} from "./constants";
 import { Node, Root, Tree } from "./accounts";
-import { attachNode, createNode } from "./instructions";
+import { attachNode, attachNote, createNode, createNote } from "./instructions";
 
 import { PROGRAM_ID as DIP_PROGRAM_ID } from "./programId";
-import { TreeDeaNote } from "./note";
+import { PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 
-export class TreeDeaNode {
+export class TreeDeaNote {
   signer: PublicKey;
   rootId: PublicKey;
   rootKey: PublicKey;
@@ -17,18 +21,17 @@ export class TreeDeaNode {
   voteMint: PublicKey;
   voteAccount: PublicKey;
   tree: PublicKey;
-  parent: PublicKey;
+  id: PublicKey;
+  note: PublicKey;
   node: PublicKey;
-  tag: string;
 
   constructor(
     signer: PublicKey,
     rootId: PublicKey,
     voteMint: PublicKey,
     tree: PublicKey,
-    parent: PublicKey,
-    node: PublicKey,
-    tag: string
+    noteId: PublicKey,
+    node: PublicKey
   ) {
     this.signer = signer;
     this.rootId = rootId;
@@ -47,9 +50,12 @@ export class TreeDeaNode {
       true
     );
     this.tree = tree;
-    this.parent = parent;
+    this.id = noteId;
+    this.note = PublicKey.findProgramAddressSync(
+      [Buffer.from(NOTE_SEED), this.tree.toBuffer(), this.id.toBuffer()],
+      DIP_PROGRAM_ID
+    )[0];
     this.node = node;
-    this.tag = tag;
   }
 
   static async fromNode(provider: anchor.AnchorProvider, node: Node) {
@@ -58,6 +64,7 @@ export class TreeDeaNode {
 
     const root = await Root.fetch(provider.connection, tree.root);
     if (!root) return;
+    console.log(tree.root.toString(), root.id.toString());
 
     const [nodeKey] = PublicKey.findProgramAddressSync(
       [
@@ -69,90 +76,41 @@ export class TreeDeaNode {
       DIP_PROGRAM_ID
     );
 
-    return new TreeDeaNode(
+    return new TreeDeaNote(
       provider.publicKey,
       root.id,
       root.voteMint,
       node.tree,
       node.parent,
-      nodeKey,
-      node.tags[node.tags.length - 1]
+      nodeKey
     );
   }
 
   instruction = {
-    createChild: (tag: string) => {
-      const [node] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from(NODE_SEED),
-          this.tree.toBuffer(),
-          this.node.toBuffer(),
-          Buffer.from(tag),
-        ],
-        DIP_PROGRAM_ID
-      );
-      console.log(this.rootKey.toString(), this.node.toString());
-      return createNode(
-        { tag },
+    createNote: (website: string, image: string, description: string) => {
+      return createNote(
+        { website, image, id: this.id, description },
         {
           signer: this.signer,
           root: this.rootKey,
           tree: this.tree,
-          parentNode: this.node,
-          node,
+          note: this.note,
+          node: this.node,
           systemProgram: anchor.web3.SystemProgram.programId,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
         }
       );
     },
-    attachNode: () => {
-      return attachNode({
+    attachNote: () => {
+      return attachNote({
         signer: this.signer,
         root: this.rootKey,
         tree: this.tree,
-        parentNode: this.parent,
+        note: this.note,
         node: this.node,
         systemProgram: anchor.web3.SystemProgram.programId,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
       });
     },
   };
-
-  createNode(tag: string) {
-    const [node] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from(NODE_SEED),
-        this.tree.toBuffer(),
-        this.node.toBuffer(),
-        Buffer.from(tag),
-      ],
-      DIP_PROGRAM_ID
-    );
-    return {
-      ix: this.instruction.createChild(tag),
-      child: new TreeDeaNode(
-        this.signer,
-        this.rootId,
-        this.voteMint,
-        this.tree,
-        this.node,
-        node,
-        tag
-      ),
-    };
-  }
-  createNote(website: string, image: string, description: string) {
-    const note = new TreeDeaNote(
-      this.signer,
-      this.rootId,
-      this.voteMint,
-      this.tree,
-      Keypair.generate().publicKey,
-      this.node
-    );
-    return {
-      ix: note.instruction.createNote(website, image, description),
-      note,
-    };
-  }
 }

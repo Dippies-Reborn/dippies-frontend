@@ -2,10 +2,13 @@ import { PublicKey, Transaction } from "@solana/web3.js";
 import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
+import CreateNodeButton from "./CreateNodeButton";
+import CreateNoteButton from "./CreateNoteButton";
 import { FaBackward } from "react-icons/fa";
 import Link from "next/link";
 import { MAX_CHILD_PER_NODE } from "../../programs/dippiesIndexProtocol";
 import NodeCard from "./NodeCard";
+import NoteCard from "./NoteCard";
 import { TreeDeaNode } from "../../programs/dippiesIndexProtocol/node";
 import { formatBn } from "../../utils";
 import { toast } from "react-hot-toast";
@@ -16,12 +19,24 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
   const wallet = useWallet();
   const provider = useProvider();
   const { connection } = useConnection();
-  const { node, children, parent, fetchChildren } = useNode(nodeKey);
+  const { node, children, parent, notes, fetchChildren } = useNode(nodeKey);
   const [tag, setTag] = useState<string>();
+  const [website, setWebsite] = useState<string>();
+  const [image, setImage] = useState<string>();
+  const [description, setDescription] = useState<string>();
   const [isCreating, setIsCreating] = useState(false);
 
   const handleTag: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setTag(e.target.value);
+  };
+  const handleWebsite: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setWebsite(e.target.value);
+  };
+  const handleImage: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setImage(e.target.value);
+  };
+  const handleDescription: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setDescription(e.target.value);
   };
 
   const handleCreateNode = async () => {
@@ -51,7 +66,34 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
     }
   };
 
-  console.log(node, children);
+  const handleCreateNote = async () => {
+    if (!provider || !node || !website || !image || !description) return;
+    const treedeaNode = await TreeDeaNode.fromNode(provider, node);
+
+    if (!treedeaNode) return;
+
+    setIsCreating(true);
+
+    const { ix, note } = treedeaNode.createNote(website, image, description);
+    const tx = new Transaction().add(ix);
+
+    // Auto attach if parent is empty
+    if (node.notes.length < MAX_CHILD_PER_NODE)
+      tx.add(note.instruction.attachNote());
+
+    try {
+      await connection.confirmTransaction(
+        await wallet.sendTransaction(tx, connection, { skipPreflight: true })
+      );
+      fetchChildren();
+    } catch (e: any) {
+      toast.error(e.toString());
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  console.log(node, children, notes, nodeKey.toString());
 
   return (
     <div className="flex flex-col w-lg justify-center p-5">
@@ -78,20 +120,26 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
           <div className="flex flex-wrap mx-auto gap-2">
             <div className="text-xl">Tags:</div>
             {node.tags.map((tag) => (
-              <div key={tag} className="badge h-full m-1">
+              <div key={tag} className="badge badge-primary h-full m-1">
                 {tag}
               </div>
             ))}
           </div>
-          {parent ? (
+          {notes ? (
             <>
-              <div className="divider text-lg">Parent</div>
-              <div className="btn" onClick={handleCreateNode}>
-                Create a child
-              </div>
-              <div className="flex flex-wrap mx-auto">
-                <NodeCard node={parent} />
-              </div>
+              <div className="divider text-lg">Notes</div>
+              {notes.length > 0 ? (
+                <div className="flex flex-wrap mx-auto">
+                  {notes.map((note) => (
+                    <NoteCard note={note} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center p-3 text-lg font-bold">
+                  This node has no notes yet...
+                </div>
+              )}
+              <CreateNoteButton node={node} />
             </>
           ) : null}
           {children ? (
@@ -109,27 +157,14 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
                 </div>
               )}
 
-              <div className="flex flex-col gap-2 max-w-3xl bg-base-300 align-center p-3 rounded-xl shadow-xl mx-auto">
-                <div className="text-xl font-bold">Tag</div>
-                <div>
-                  <div className="text-sm">The tag of the child node.</div>
-                  <div className="text-sm">
-                    A node inherits all his tags from its parent
-                  </div>
-                </div>
-                <input
-                  className="input input-bordered w-full"
-                  placeholder="Tag..."
-                  onChange={handleTag}
-                />
-                <div
-                  className={`btn ${tag ? "" : "btn-disabled"} ${
-                    isCreating ? "btn-disabled loading" : ""
-                  }`}
-                  onClick={handleCreateNode}
-                >
-                  Create a child
-                </div>
+              <CreateNodeButton node={node} onCreate={fetchChildren} />
+            </>
+          ) : null}
+          {parent ? (
+            <>
+              <div className="divider text-lg">Parent</div>
+              <div className="flex flex-wrap mx-auto">
+                <NodeCard node={parent} />
               </div>
             </>
           ) : null}

@@ -1,10 +1,11 @@
 import * as anchor from "@project-serum/anchor";
 
+import { Node, Note } from "../programs/dippiesIndexProtocol/accounts";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 
-import { Node } from "../programs/dippiesIndexProtocol/accounts";
 import { NodeWithKey } from "./useTree";
+import { NoteWithKey } from "./useNote";
 
 export default function useNode(nodeKey: anchor.web3.PublicKey) {
   const wallet = useAnchorWallet();
@@ -12,6 +13,7 @@ export default function useNode(nodeKey: anchor.web3.PublicKey) {
   const [parent, setParent] = useState<NodeWithKey>();
   const [node, setNode] = useState<NodeWithKey>();
   const [children, setChildren] = useState<NodeWithKey[]>();
+  const [notes, setNotes] = useState<NoteWithKey[]>();
 
   const fetchNode = async () => {
     if (!connection || !wallet?.publicKey) return;
@@ -21,8 +23,8 @@ export default function useNode(nodeKey: anchor.web3.PublicKey) {
     if (res) setNode({ ...res, key: nodeKey } as any);
   };
   useEffect(() => {
-    if (!node) fetchNode();
-  }, [wallet?.publicKey, node]);
+    fetchNode();
+  }, [wallet?.publicKey, nodeKey]);
 
   const fetchParent = async () => {
     if (!connection || !wallet?.publicKey || !node) return;
@@ -34,7 +36,7 @@ export default function useNode(nodeKey: anchor.web3.PublicKey) {
     } catch {}
   };
   useEffect(() => {
-    if (!parent) fetchParent();
+    fetchParent();
   }, [wallet?.publicKey, node]);
 
   const fetchChildren = async () => {
@@ -52,8 +54,26 @@ export default function useNode(nodeKey: anchor.web3.PublicKey) {
     setChildren(res as any);
   };
   useEffect(() => {
-    if (!children) fetchChildren();
+    fetchChildren();
   }, [wallet?.publicKey, node]);
 
-  return { node, children, parent, fetchChildren };
+  const fetchNotes = async () => {
+    if (!connection || !wallet?.publicKey || !node) return;
+
+    const res = await Promise.all(
+      node.notes
+        .map(async (child) => ({
+          ...(await Note.fetch(connection, child)),
+          key: child,
+        }))
+        .filter(Boolean)
+    );
+
+    setNotes(res as any);
+  };
+  useEffect(() => {
+    fetchNotes();
+  }, [wallet?.publicKey, node]);
+
+  return { node, children, parent, notes, fetchChildren };
 }
