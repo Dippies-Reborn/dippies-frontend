@@ -57,14 +57,20 @@ export default ({
   return (
     <>
       <div
-        className="btn btn-outline max-w-xl mx-auto flex flex-row gap-3"
+        className="w-64 bg-base-100 hover:bg-base-200 transition-all border-2 border-base-200 rounded-xl shadow-inner hover:shadow-xl p-6 m-3"
         onClick={() => setIsOpen(true)}
       >
-        <div>Create node</div>
-        <BsNodePlusFill className="w-6 h-6" />
+        <BsNodePlusFill className="w-20 h-20 m-auto" />
+        <div className="text-2xl text-center">Create node</div>
       </div>
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
         <div className="modal-box flex flex-col gap-2 max-w-3xl bg-base-300 align-center p-3 rounded-xl shadow-xl mx-auto">
+          <div
+            className="btn btn-sm btn-circle fixed right-2 top-2 absolute"
+            onClick={() => setIsOpen(false)}
+          >
+            ✕
+          </div>
           <div className="text-xl font-bold">Tag</div>
           <div>
             <div className="text-sm">The tag of the child node.</div>

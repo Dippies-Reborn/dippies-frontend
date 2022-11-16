@@ -65,11 +65,11 @@ export default ({
   return (
     <>
       <div
-        className="btn btn-outline max-w-xl mx-auto flex flex-row gap-3"
+        className="w-64 bg-base-100 hover:bg-base-200 transition-all border-2 border-base-200 rounded-xl shadow-inner hover:shadow-xl p-6 m-3"
         onClick={() => setIsOpen(true)}
       >
-        <div>Create note</div>
-        <AiFillFileAdd className="w-6 h-6" />
+        <AiFillFileAdd className="w-20 h-20 m-auto" />
+        <div className="text-2xl text-center">Create note</div>
       </div>
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
         <div className="flex flex-col w-lg justify-center p-5">

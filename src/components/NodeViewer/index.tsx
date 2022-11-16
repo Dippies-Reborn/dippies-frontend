@@ -1,12 +1,15 @@
+import { BsArrowLeft, BsBack, BsThreeDots } from "react-icons/bs";
+import {
+  MAX_CHILD_PER_NODE,
+  MAX_NOTES_PER_NODE,
+} from "../../programs/dippiesIndexProtocol";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import CreateNodeButton from "./CreateNodeButton";
 import CreateNoteButton from "./CreateNoteButton";
-import { FaBackward } from "react-icons/fa";
 import Link from "next/link";
-import { MAX_CHILD_PER_NODE } from "../../programs/dippiesIndexProtocol";
 import NodeCard from "./NodeCard";
 import NoteCard from "./NoteCard";
 import { TreeDeaNode } from "../../programs/dippiesIndexProtocol/node";
@@ -104,8 +107,8 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
             : `/dip/trees`
         }
       >
-        <div className="btn">
-          <FaBackward className="w-8 h-8" />
+        <div className="btn btn-ghost">
+          <BsArrowLeft className="w-8 h-8" />
         </div>
       </Link>
       {node ? (
@@ -128,36 +131,43 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
           {notes ? (
             <>
               <div className="divider text-lg">Notes</div>
-              {notes.length > 0 ? (
-                <div className="flex flex-wrap mx-auto">
-                  {notes.map((note) => (
-                    <NoteCard note={note} />
+              <div className="flex flex-wrap mx-auto">
+                {notes.map((note) => (
+                  <NoteCard key={note.key.toString()} note={note} />
+                ))}
+                {Array(MAX_NOTES_PER_NODE - notes.length)
+                  .fill(0)
+                  .map((_, i) => (
+                    <CreateNoteButton key={`create-note-${i}`} node={node} />
                   ))}
-                </div>
-              ) : (
-                <div className="text-center p-3 text-lg font-bold">
-                  This node has no notes yet...
-                </div>
-              )}
-              <CreateNoteButton node={node} />
+              </div>
+              <div className="btn btn-ghost w-fit mx-auto">
+                <BsThreeDots className="w-12 h-12 m-auto" />
+              </div>
             </>
           ) : null}
           {children ? (
             <>
               <div className="divider text-lg">Children</div>
-              {children.length > 0 ? (
-                <div className="flex flex-wrap mx-auto">
-                  {children.map((child) => (
-                    <NodeCard node={child} />
+              <div className="flex flex-wrap mx-auto">
+                {children
+                  .sort((a, b) => (a.stake.gt(b.stake) ? -1 : 1))
+                  .map((child) => (
+                    <NodeCard key={child.key.toString()} node={child} />
                   ))}
-                </div>
-              ) : (
-                <div className="text-center p-3 text-lg font-bold">
-                  This node has no child yet...
-                </div>
-              )}
-
-              <CreateNodeButton node={node} onCreate={fetchChildren} />
+                {Array(MAX_CHILD_PER_NODE - children.length)
+                  .fill(0)
+                  .map((_, i) => (
+                    <CreateNodeButton
+                      key={`create-node-${i}`}
+                      node={node}
+                      onCreate={fetchChildren}
+                    />
+                  ))}
+              </div>
+              <div className="btn btn-ghost w-fit mx-auto">
+                <BsThreeDots className="w-12 h-12 m-auto" />
+              </div>
             </>
           ) : null}
           {parent ? (
