@@ -11,8 +11,12 @@ export const shortAddress = (key: PublicKey) => {
   );
 };
 
-export const formatBn = (n: BN) => {
-  return n.toNumber();
+export const formatBn = (n: BN | string) => {
+  if (typeof n === "string") {
+    return Number(n);
+  } else {
+    return n.toNumber();
+  }
 };
 
 /**

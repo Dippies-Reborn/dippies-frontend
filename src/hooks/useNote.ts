@@ -12,22 +12,29 @@ export interface NoteWithKey extends Note {
   key: PublicKey;
 }
 
+export interface StakeAccountWithKey extends StakeAccount {
+  key: PublicKey;
+}
+
 export default function useNote(note: NoteWithKey) {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
-  const [userStake, setUserStake] = useState<number>();
+  const [userStake, setUserStake] = useState<StakeAccountWithKey>();
 
   const fetchUserStake = async () => {
     if (!connection || !wallet?.publicKey) return;
 
     const stakeKey = TreeDeaStakeAccount.key(note.key, wallet.publicKey);
     const res = await StakeAccount.fetch(connection, stakeKey);
+    console.log(res);
 
-    if (res) setUserStake({ ...res, key: stakeKey } as any);
+    if (res) {
+      setUserStake({ ...res, key: stakeKey } as any);
+    }
   };
   useEffect(() => {
     if (!note) fetchUserStake();
   }, [wallet?.publicKey, note]);
 
-  return { userStake };
+  return { userStake, fetchUserStake };
 }

@@ -96,8 +96,6 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
     }
   };
 
-  console.log(node, children, notes, nodeKey.toString());
-
   return (
     <div className="flex flex-col w-lg justify-center p-5">
       <Link

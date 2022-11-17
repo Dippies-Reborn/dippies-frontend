@@ -1,15 +1,21 @@
 import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
+import { AnchorProvider, BN } from "@project-serum/anchor";
+import {
   NOTE_SEED,
   ROOT_AUTHORITY_SEED,
   ROOT_SEED,
   STAKE_SEED,
 } from "./constants";
 import { Node, Note, Root, Tree } from "./accounts";
+import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram } from "@solana/web3.js";
+import { createStake, updateStake } from "./instructions";
 
-import { AnchorProvider } from "@project-serum/anchor";
 import { PROGRAM_ID as DIP_PROGRAM_ID } from "./programId";
-import { PublicKey } from "@solana/web3.js";
-import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { StakeAccount } from "./accounts/StakeAccount";
 
 export class TreeDeaStakeAccount {
   signer: PublicKey;
@@ -85,4 +91,60 @@ export class TreeDeaStakeAccount {
       DIP_PROGRAM_ID
     )[0];
   }
+
+  instruction = {
+    createStake: () => {
+      return createStake({
+        signer: this.signer,
+        rootAuthority: this.rootAuthority,
+        root: this.rootKey,
+        voteMint: this.voteMint,
+        tree: this.tree,
+        node: this.node,
+        note: this.note,
+        stakeAccount: TreeDeaStakeAccount.key(this.note, this.signer),
+        stakerAccount: getAssociatedTokenAddressSync(
+          this.voteMint,
+          this.signer
+        ),
+        voteAccount: getAssociatedTokenAddressSync(
+          this.voteMint,
+          this.rootAuthority,
+          true
+        ),
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+        rent: SYSVAR_RENT_PUBKEY,
+      });
+    },
+    updateStake: (stake: BN) => {
+      return updateStake(
+        { stake },
+        {
+          signer: this.signer,
+          rootAuthority: this.rootAuthority,
+          root: this.rootKey,
+          voteMint: this.voteMint,
+          tree: this.tree,
+          node: this.node,
+          note: this.note,
+          stakeAccount: TreeDeaStakeAccount.key(this.note, this.signer),
+          stakerAccount: getAssociatedTokenAddressSync(
+            this.voteMint,
+            this.signer
+          ),
+          voteAccount: getAssociatedTokenAddressSync(
+            this.voteMint,
+            this.rootAuthority,
+            true
+          ),
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+          rent: SYSVAR_RENT_PUBKEY,
+        }
+      );
+    },
+  };
 }
