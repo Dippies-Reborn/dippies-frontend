@@ -76,8 +76,13 @@ export class EntanglerWrapper {
       EntanglerWrapper.address.entangledCollectionMint(id);
     this.entangledCollectionMasterEdition =
       EntanglerWrapper.address.entangledCollectionMasterEdition(id);
-    this.entangledCollectionMetadata = this.entangledCollectionMintAccount =
+    this.entangledCollectionMetadata =
       EntanglerWrapper.address.entangledCollectionMetadata(id);
+    this.entangledCollectionMintAccount = getAssociatedTokenAddressSync(
+      this.entangledCollectionMint,
+      this.entanglerAuthority,
+      true
+    );
 
     this.originalCollectionMint = originalCollectionMint;
     this.originalCollectionMetadata = PublicKey.findProgramAddressSync(
@@ -88,14 +93,11 @@ export class EntanglerWrapper {
       ],
       METADATA_PROGRAM_ID
     )[0];
-    this.originalMintEscrow = PublicKey.findProgramAddressSync(
-      [
-        this.entanglerAuthority.toBuffer(),
-        TOKEN_PROGRAM_ID.toBuffer(),
-        originalCollectionMint.toBuffer(),
-      ],
-      ASSOCIATED_TOKEN_PROGRAM_ID
-    )[0];
+    this.originalMintEscrow = getAssociatedTokenAddressSync(
+      originalCollectionMint,
+      this.entanglerAuthority,
+      true
+    );
   }
 
   static address = {
@@ -187,14 +189,6 @@ export class EntanglerWrapper {
       );
     },
     createCollection: (oneWay: boolean) => {
-      const [entangledCollectionMintAccount] = PublicKey.findProgramAddressSync(
-        [
-          this.entanglerAuthority.toBuffer(),
-          TOKEN_PROGRAM_ID.toBuffer(),
-          this.entangledCollectionMint.toBuffer(),
-        ],
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      );
       return createCollection(
         { id: this.id, royalties: this.royalties, oneWay },
         {
@@ -204,11 +198,10 @@ export class EntanglerWrapper {
           entangledCollection: this.entangledCollection,
           entangledCollectionMint: this.entangledCollectionMint,
           masterEdition: this.entangledCollectionMasterEdition,
-          entangledCollectionMetadata:
-            EntanglerWrapper.address.entangledCollectionMetadata(this.id),
+          entangledCollectionMetadata: this.entangledCollectionMetadata,
           originalCollectionMint: this.originalCollectionMint,
           originalCollectionMetadata: this.originalCollectionMetadata,
-          entangledCollectionMintAccount,
+          entangledCollectionMintAccount: this.entangledCollectionMintAccount,
           metadataProgram: METADATA_PROGRAM_ID,
           tokenProgram: TOKEN_PROGRAM_ID,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,

@@ -1,6 +1,18 @@
 import { BN, utils } from "@project-serum/anchor";
 import { EntanglerState, EntanglerWrapper } from "../../programs/entangler";
-import { LAMPORTS_PER_SOL, PublicKey, Transaction } from "@solana/web3.js";
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
+import {
+  NATIVE_MINT,
+  createSyncNativeInstruction,
+  createTransferInstruction,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import React, { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -66,13 +78,29 @@ export default () => {
     const entangler = new EntanglerWrapper(
       mint,
       wallet.publicKey,
-      mint,
+      Keypair.generate().publicKey,
       royalties,
       Math.round(percentage * 100)
     );
 
     await wallet.sendTransaction(
       new Transaction()
+        .add(
+          SystemProgram.transfer({
+            fromPubkey: wallet.publicKey,
+            toPubkey: getAssociatedTokenAddressSync(
+              NATIVE_MINT,
+              wallet.publicKey,
+              true
+            ),
+            lamports: entanglerState.price.toNumber(),
+          })
+        )
+        .add(
+          createSyncNativeInstruction(
+            getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, true)
+          )
+        )
         .add(entangler.instruction.createCollection(oneWay))
         .add(
           entangler.instruction.createCollectionEntry(
@@ -83,6 +111,12 @@ export default () => {
         ),
       connection
     );
+
+    setIsOpen(false);
+    setMint(undefined);
+    setRoyalties(undefined);
+    setPercentage(undefined);
+    setKey(undefined);
   };
 
   return (
@@ -124,7 +158,7 @@ export default () => {
               />
             </div>
             <div className="">
-              <div className="font-bold">Royalties earner</div>
+              <div className="font-bold">Royalties</div>
               <div className="text-sm text-neutral-content">
                 The percentage taken for royalties on each trade.
               </div>
