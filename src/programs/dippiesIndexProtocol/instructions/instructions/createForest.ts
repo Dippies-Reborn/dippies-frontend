@@ -3,24 +3,20 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface CreateStakeAccounts {
+export interface CreateForestArgs {
+  id: PublicKey
+  admin: PublicKey
+  treeCreationFee: BN
+}
+
+export interface CreateForestAccounts {
   signer: PublicKey
   /** The account that manages tokens */
-  rootAuthority: PublicKey
-  /** The global root */
-  root: PublicKey
+  forestAuthority: PublicKey
+  /** The forest */
+  forest: PublicKey
   /** The token used to vote for nodes and tags */
   voteMint: PublicKey
-  /** The tree */
-  tree: PublicKey
-  /** The node the note is attached to */
-  node: PublicKey
-  /** The attached note */
-  note: PublicKey
-  /** The account storing vote tokens */
-  stakeAccount: PublicKey
-  /** The account storing vote tokens */
-  stakerAccount: PublicKey
   /** The account storing vote tokens */
   voteAccount: PublicKey
   /** Common Solana programs */
@@ -30,17 +26,21 @@ export interface CreateStakeAccounts {
   rent: PublicKey
 }
 
-export function createStake(accounts: CreateStakeAccounts) {
+export const layout = borsh.struct([
+  borsh.publicKey("id"),
+  borsh.publicKey("admin"),
+  borsh.u64("treeCreationFee"),
+])
+
+export function createForest(
+  args: CreateForestArgs,
+  accounts: CreateForestAccounts
+) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
-    { pubkey: accounts.rootAuthority, isSigner: false, isWritable: false },
-    { pubkey: accounts.root, isSigner: false, isWritable: false },
+    { pubkey: accounts.forestAuthority, isSigner: false, isWritable: false },
+    { pubkey: accounts.forest, isSigner: false, isWritable: true },
     { pubkey: accounts.voteMint, isSigner: false, isWritable: false },
-    { pubkey: accounts.tree, isSigner: false, isWritable: false },
-    { pubkey: accounts.node, isSigner: false, isWritable: false },
-    { pubkey: accounts.note, isSigner: false, isWritable: true },
-    { pubkey: accounts.stakeAccount, isSigner: false, isWritable: true },
-    { pubkey: accounts.stakerAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.voteAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     {
@@ -51,8 +51,17 @@ export function createStake(accounts: CreateStakeAccounts) {
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([201, 134, 55, 171, 2, 136, 228, 226])
-  const data = identifier
+  const identifier = Buffer.from([114, 120, 10, 96, 7, 35, 152, 115])
+  const buffer = Buffer.alloc(1000)
+  const len = layout.encode(
+    {
+      id: args.id,
+      admin: args.admin,
+      treeCreationFee: args.treeCreationFee,
+    },
+    buffer
+  )
+  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
   const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
   return ix
 }

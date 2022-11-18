@@ -4,33 +4,66 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import { PROGRAM_ID } from "../programId"
 
 export interface NoteFields {
+  /** Unique noteidetifier */
   id: PublicKey
+  /** The website the note points to */
   website: string
+  /** Thecoverimage ofthe note */
   image: string
+  /** A short description of the website the note points to */
   description: string
+  /** The set of tags on this node */
   tags: Array<string>
+  /** The node this note is attached to */
   parent: PublicKey
+  /** The stake currently on this note */
   stake: BN
+  /** The total stake accumulated per unit of time */
+  accumulatedStake: BN
+  /** The last time this note was updated */
+  lastUpdate: BN
 }
 
 export interface NoteJSON {
+  /** Unique noteidetifier */
   id: string
+  /** The website the note points to */
   website: string
+  /** Thecoverimage ofthe note */
   image: string
+  /** A short description of the website the note points to */
   description: string
+  /** The set of tags on this node */
   tags: Array<string>
+  /** The node this note is attached to */
   parent: string
+  /** The stake currently on this note */
   stake: string
+  /** The total stake accumulated per unit of time */
+  accumulatedStake: string
+  /** The last time this note was updated */
+  lastUpdate: string
 }
 
 export class Note {
+  /** Unique noteidetifier */
   readonly id: PublicKey
+  /** The website the note points to */
   readonly website: string
+  /** Thecoverimage ofthe note */
   readonly image: string
+  /** A short description of the website the note points to */
   readonly description: string
+  /** The set of tags on this node */
   readonly tags: Array<string>
+  /** The node this note is attached to */
   readonly parent: PublicKey
+  /** The stake currently on this note */
   readonly stake: BN
+  /** The total stake accumulated per unit of time */
+  readonly accumulatedStake: BN
+  /** The last time this note was updated */
+  readonly lastUpdate: BN
 
   static readonly discriminator = Buffer.from([
     203, 75, 252, 196, 81, 210, 122, 126,
@@ -44,6 +77,8 @@ export class Note {
     borsh.vec(borsh.str(), "tags"),
     borsh.publicKey("parent"),
     borsh.u64("stake"),
+    borsh.u64("accumulatedStake"),
+    borsh.i64("lastUpdate"),
   ])
 
   constructor(fields: NoteFields) {
@@ -54,6 +89,8 @@ export class Note {
     this.tags = fields.tags
     this.parent = fields.parent
     this.stake = fields.stake
+    this.accumulatedStake = fields.accumulatedStake
+    this.lastUpdate = fields.lastUpdate
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<Note | null> {
@@ -102,6 +139,8 @@ export class Note {
       tags: dec.tags,
       parent: dec.parent,
       stake: dec.stake,
+      accumulatedStake: dec.accumulatedStake,
+      lastUpdate: dec.lastUpdate,
     })
   }
 
@@ -114,6 +153,8 @@ export class Note {
       tags: this.tags,
       parent: this.parent.toString(),
       stake: this.stake.toString(),
+      accumulatedStake: this.accumulatedStake.toString(),
+      lastUpdate: this.lastUpdate.toString(),
     }
   }
 
@@ -126,6 +167,8 @@ export class Note {
       tags: obj.tags,
       parent: new PublicKey(obj.parent),
       stake: new BN(obj.stake),
+      accumulatedStake: new BN(obj.accumulatedStake),
+      lastUpdate: new BN(obj.lastUpdate),
     })
   }
 }

@@ -4,8 +4,8 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import { PROGRAM_ID } from "../programId"
 
 export interface TreeFields {
-  /** The root of the tree */
-  root: PublicKey
+  /** The forest this tree grows in */
+  forest: PublicKey
   /** The root node of the tree */
   rootNode: PublicKey
   /** Title of the tree */
@@ -15,8 +15,8 @@ export interface TreeFields {
 }
 
 export interface TreeJSON {
-  /** The root of the tree */
-  root: string
+  /** The forest this tree grows in */
+  forest: string
   /** The root node of the tree */
   rootNode: string
   /** Title of the tree */
@@ -26,8 +26,8 @@ export interface TreeJSON {
 }
 
 export class Tree {
-  /** The root of the tree */
-  readonly root: PublicKey
+  /** The forest this tree grows in */
+  readonly forest: PublicKey
   /** The root node of the tree */
   readonly rootNode: PublicKey
   /** Title of the tree */
@@ -40,14 +40,14 @@ export class Tree {
   ])
 
   static readonly layout = borsh.struct([
-    borsh.publicKey("root"),
+    borsh.publicKey("forest"),
     borsh.publicKey("rootNode"),
     borsh.str("title"),
     borsh.u64("stake"),
   ])
 
   constructor(fields: TreeFields) {
-    this.root = fields.root
+    this.forest = fields.forest
     this.rootNode = fields.rootNode
     this.title = fields.title
     this.stake = fields.stake
@@ -92,7 +92,7 @@ export class Tree {
     const dec = Tree.layout.decode(data.slice(8))
 
     return new Tree({
-      root: dec.root,
+      forest: dec.forest,
       rootNode: dec.rootNode,
       title: dec.title,
       stake: dec.stake,
@@ -101,7 +101,7 @@ export class Tree {
 
   toJSON(): TreeJSON {
     return {
-      root: this.root.toString(),
+      forest: this.forest.toString(),
       rootNode: this.rootNode.toString(),
       title: this.title,
       stake: this.stake.toString(),
@@ -110,7 +110,7 @@ export class Tree {
 
   static fromJSON(obj: TreeJSON): Tree {
     return new Tree({
-      root: new PublicKey(obj.root),
+      forest: new PublicKey(obj.forest),
       rootNode: new PublicKey(obj.rootNode),
       title: obj.title,
       stake: new BN(obj.stake),

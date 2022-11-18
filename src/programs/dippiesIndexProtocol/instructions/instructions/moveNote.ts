@@ -5,8 +5,8 @@ import { PROGRAM_ID } from "../programId"
 
 export interface MoveNoteAccounts {
   signer: PublicKey
-  /** The global root */
-  root: PublicKey
+  /** The forest */
+  forest: PublicKey
   /** The tree */
   tree: PublicKey
   /** The node the note is currently attached to */
@@ -22,7 +22,7 @@ export interface MoveNoteAccounts {
 export function moveNote(accounts: MoveNoteAccounts) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
-    { pubkey: accounts.root, isSigner: false, isWritable: false },
+    { pubkey: accounts.forest, isSigner: false, isWritable: false },
     { pubkey: accounts.tree, isSigner: false, isWritable: false },
     { pubkey: accounts.sourceNode, isSigner: false, isWritable: true },
     { pubkey: accounts.destinationNode, isSigner: false, isWritable: false },

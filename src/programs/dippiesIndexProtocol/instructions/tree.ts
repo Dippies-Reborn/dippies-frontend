@@ -1,26 +1,24 @@
-import * as anchor from "@project-serum/anchor";
-
 import { NODE_SEED, TREE_SEED } from "./constants";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram } from "@solana/web3.js";
 
+import { DipForest } from "./index";
 import { PROGRAM_ID as TREEDEA_ID } from "./programId";
-import { TreeDeaRoot } from "./index";
 import { createNode } from "./instructions";
 
-export class TreeDeaTree {
-  root: TreeDeaRoot;
+export class DipTree {
+  forest: DipForest;
   treeKey: PublicKey;
   rootNode: PublicKey;
+  title: string;
 
-  constructor(
-    signer: PublicKey,
-    rootId: PublicKey,
-    voteMint: PublicKey,
-    tag: string
-  ) {
-    this.root = new TreeDeaRoot(signer, rootId, voteMint);
+  constructor(forest: DipForest, title: string) {
+    this.forest = forest;
     this.treeKey = PublicKey.findProgramAddressSync(
-      [Buffer.from(TREE_SEED), this.root.rootKey.toBuffer(), Buffer.from(tag)],
+      [
+        Buffer.from(TREE_SEED),
+        this.forest.forestKey.toBuffer(),
+        Buffer.from(title),
+      ],
       TREEDEA_ID
     )[0];
     this.rootNode = PublicKey.findProgramAddressSync(
@@ -28,10 +26,11 @@ export class TreeDeaTree {
         Buffer.from(NODE_SEED),
         this.treeKey.toBuffer(),
         PublicKey.default.toBuffer(),
-        Buffer.from(tag),
+        Buffer.from(title),
       ],
       TREEDEA_ID
     )[0];
+    this.title = title;
   }
 
   instruction = {
@@ -49,13 +48,13 @@ export class TreeDeaTree {
       return createNode(
         { tag },
         {
-          signer: this.root.signer,
-          root: this.root.rootKey,
+          signer: this.forest.signer,
+          forest: this.forest.forestKey,
           tree: this.treeKey,
           parentNode: this.rootNode,
           node,
           systemProgram: SystemProgram.programId,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+          rent: SYSVAR_RENT_PUBKEY,
         }
       );
     },

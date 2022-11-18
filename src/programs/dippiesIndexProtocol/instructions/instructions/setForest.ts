@@ -3,53 +3,46 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface CreateNoteArgs {
-  id: PublicKey
-  website: string
-  image: string
-  description: string
+export interface SetForestArgs {
+  admin: PublicKey
+  treeCreationFee: BN
 }
 
-export interface CreateNoteAccounts {
+export interface SetForestAccounts {
   signer: PublicKey
-  /** The global root */
-  root: PublicKey
-  /** The tree */
-  tree: PublicKey
-  /** The node to attach to */
-  node: PublicKey
-  /** The new note */
-  note: PublicKey
+  /** The forest */
+  forest: PublicKey
   /** Common Solana programs */
+  tokenProgram: PublicKey
+  associatedTokenProgram: PublicKey
   systemProgram: PublicKey
   rent: PublicKey
 }
 
 export const layout = borsh.struct([
-  borsh.publicKey("id"),
-  borsh.str("website"),
-  borsh.str("image"),
-  borsh.str("description"),
+  borsh.publicKey("admin"),
+  borsh.u64("treeCreationFee"),
 ])
 
-export function createNote(args: CreateNoteArgs, accounts: CreateNoteAccounts) {
+export function setForest(args: SetForestArgs, accounts: SetForestAccounts) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
-    { pubkey: accounts.root, isSigner: false, isWritable: false },
-    { pubkey: accounts.tree, isSigner: false, isWritable: false },
-    { pubkey: accounts.node, isSigner: false, isWritable: false },
-    { pubkey: accounts.note, isSigner: false, isWritable: true },
+    { pubkey: accounts.forest, isSigner: false, isWritable: false },
+    { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
+    {
+      pubkey: accounts.associatedTokenProgram,
+      isSigner: false,
+      isWritable: false,
+    },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([103, 2, 208, 242, 86, 156, 151, 107])
+  const identifier = Buffer.from([205, 72, 135, 24, 125, 146, 35, 2])
   const buffer = Buffer.alloc(1000)
   const len = layout.encode(
     {
-      id: args.id,
-      website: args.website,
-      image: args.image,
-      description: args.description,
+      admin: args.admin,
+      treeCreationFee: args.treeCreationFee,
     },
     buffer
   )

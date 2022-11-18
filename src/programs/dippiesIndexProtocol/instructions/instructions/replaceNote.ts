@@ -3,32 +3,33 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface AttachNodeAccounts {
+export interface ReplaceNoteAccounts {
   signer: PublicKey
-  /** The global root */
-  root: PublicKey
+  /** The forest */
+  forest: PublicKey
   /** The tree */
   tree: PublicKey
-  /** The parent node to attach to */
-  parentNode: PublicKey
-  /** The attached node */
+  /** The node the note will be attached to */
   node: PublicKey
+  /** The new note */
+  note: PublicKey
+  /** The new note */
+  weakNote: PublicKey
   /** Common Solana programs */
   systemProgram: PublicKey
-  rent: PublicKey
 }
 
-export function attachNode(accounts: AttachNodeAccounts) {
+export function replaceNote(accounts: ReplaceNoteAccounts) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
-    { pubkey: accounts.root, isSigner: false, isWritable: false },
+    { pubkey: accounts.forest, isSigner: false, isWritable: false },
     { pubkey: accounts.tree, isSigner: false, isWritable: false },
-    { pubkey: accounts.parentNode, isSigner: false, isWritable: true },
     { pubkey: accounts.node, isSigner: false, isWritable: true },
+    { pubkey: accounts.note, isSigner: false, isWritable: true },
+    { pubkey: accounts.weakNote, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-    { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([222, 53, 143, 98, 138, 62, 148, 196])
+  const identifier = Buffer.from([57, 50, 234, 92, 148, 156, 171, 166])
   const data = identifier
   const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
   return ix
