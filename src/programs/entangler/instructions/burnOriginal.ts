@@ -3,21 +3,21 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface InitializePairAccounts {
+export interface BurnOriginalAccounts {
   signer: PublicKey
-  /** The update authority of thee collection */
-  creator: PublicKey
   entanglerAuthority: PublicKey
-  masterEdition: PublicKey
   entangledCollection: PublicKey
-  entangledCollectionMint: PublicKey
-  entangledCollectionMetadata: PublicKey
+  entangledPair: PublicKey
+  originalCollectionMint: PublicKey
+  originalCollectionMetadata: PublicKey
   originalMint: PublicKey
   originalMetadata: PublicKey
+  /** The master edition of the token */
+  masterEdition: PublicKey
   originalMintEscrow: PublicKey
   entangledMint: PublicKey
-  entangledMetadata: PublicKey
-  entangledMintEscrow: PublicKey
+  entangledCollectionMint: PublicKey
+  entangledMintAccount: PublicKey
   /** Common Solana programs */
   metadataProgram: PublicKey
   tokenProgram: PublicKey
@@ -26,34 +26,42 @@ export interface InitializePairAccounts {
   rent: PublicKey
 }
 
-/** Creates an entanglement pair for one of the collection's token */
-export function initializePair(accounts: InitializePairAccounts) {
+/** Burn original token but prevents future disentanglement */
+export function burnOriginal(accounts: BurnOriginalAccounts) {
   const keys: Array<AccountMeta> = [
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
-    { pubkey: accounts.creator, isSigner: false, isWritable: false },
     { pubkey: accounts.entanglerAuthority, isSigner: false, isWritable: true },
-    { pubkey: accounts.masterEdition, isSigner: false, isWritable: true },
     {
       pubkey: accounts.entangledCollection,
       isSigner: false,
       isWritable: false,
     },
+    { pubkey: accounts.entangledPair, isSigner: false, isWritable: true },
     {
-      pubkey: accounts.entangledCollectionMint,
-      isSigner: false,
-      isWritable: true,
-    },
-    {
-      pubkey: accounts.entangledCollectionMetadata,
+      pubkey: accounts.originalCollectionMint,
       isSigner: false,
       isWritable: false,
     },
+    {
+      pubkey: accounts.originalCollectionMetadata,
+      isSigner: false,
+      isWritable: true,
+    },
     { pubkey: accounts.originalMint, isSigner: false, isWritable: true },
-    { pubkey: accounts.originalMetadata, isSigner: false, isWritable: false },
+    { pubkey: accounts.originalMetadata, isSigner: false, isWritable: true },
+    { pubkey: accounts.masterEdition, isSigner: false, isWritable: true },
     { pubkey: accounts.originalMintEscrow, isSigner: false, isWritable: true },
-    { pubkey: accounts.entangledMint, isSigner: false, isWritable: true },
-    { pubkey: accounts.entangledMetadata, isSigner: false, isWritable: true },
-    { pubkey: accounts.entangledMintEscrow, isSigner: false, isWritable: true },
+    { pubkey: accounts.entangledMint, isSigner: false, isWritable: false },
+    {
+      pubkey: accounts.entangledCollectionMint,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: accounts.entangledMintAccount,
+      isSigner: false,
+      isWritable: true,
+    },
     { pubkey: accounts.metadataProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     {
@@ -64,7 +72,7 @@ export function initializePair(accounts: InitializePairAccounts) {
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([177, 114, 226, 34, 186, 150, 5, 245])
+  const identifier = Buffer.from([233, 177, 56, 184, 8, 125, 162, 159])
   const data = identifier
   const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
   return ix

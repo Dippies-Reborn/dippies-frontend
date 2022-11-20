@@ -12,6 +12,8 @@ interface UserNftsContextProps {
   isFetching: boolean;
   fetchTokens: () => Promise<void>;
   setCollections: (original: PublicKey, entangled: PublicKey) => void;
+  entangled: (tokens: Nft[]) => void;
+  disentangled: (tokens: Nft[]) => void;
 }
 export const UserNftsContext = React.createContext<UserNftsContextProps>({
   tokens: [],
@@ -19,6 +21,8 @@ export const UserNftsContext = React.createContext<UserNftsContextProps>({
   isFetching: false,
   fetchTokens: () => new Promise(() => {}),
   setCollections: (original: PublicKey, entangled: PublicKey) => {},
+  entangled: (tokens: Nft[]) => {},
+  disentangled: (tokens: Nft[]) => {},
 });
 
 export const UserNftsProvider = ({
@@ -102,6 +106,15 @@ export const UserNftsProvider = ({
     setAddresses([original, entangled]);
   };
 
+  const entangled = (tokens: Nft[]) => {
+    setEntangledTokens((old) => (!old ? tokens : [...old, ...tokens]));
+    setTokens((old) => old?.filter((e) => !tokens.includes(e)));
+  };
+  const disentangled = (tokens: Nft[]) => {
+    setEntangledTokens((old) => old?.filter((e) => !tokens.includes(e)));
+    setTokens((old) => (!old ? tokens : [...old, ...tokens]));
+  };
+
   return (
     <UserNftsContext.Provider
       value={{
@@ -110,6 +123,8 @@ export const UserNftsProvider = ({
         isFetching,
         setCollections,
         fetchTokens,
+        entangled,
+        disentangled,
       }}
     >
       {children}
