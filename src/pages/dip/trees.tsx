@@ -12,8 +12,13 @@ const DIPHome: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="mt-24">
-        <TreeCreator />
         <TreeList />
+        <div className="w-fit m-10 mx-auto p-3 bg-base-200 rounded-xl">
+          <div className="text-xl">
+            Can't find the topic you're looking for?
+          </div>
+          <TreeCreator />
+        </div>
       </div>
     </>
   );

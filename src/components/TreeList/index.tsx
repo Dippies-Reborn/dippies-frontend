@@ -14,13 +14,15 @@ export default () => {
           <Link key={tree.title} href={`/dip/node/${tree.rootNode.toString()}`}>
             <div className="bg-base-200 shadow-xl rounded-xl p-5 m-3">
               <div className="text-lg font-bold">{tree.title}</div>
-              <div>
-                Total stake:{" "}
-                {forest ? (
-                  <TokenInfo mint={forest.voteMint} amount={tree.stake} />
-                ) : (
-                  "???"
-                )}
+              <div className="flex flex-row gap-5 justify-between">
+                <div>Total stake:</div>
+                <div>
+                  {forest ? (
+                    <TokenInfo mint={forest.voteMint} amount={tree.stake} />
+                  ) : (
+                    "???"
+                  )}
+                </div>
               </div>
             </div>
           </Link>

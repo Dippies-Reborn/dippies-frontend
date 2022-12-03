@@ -50,10 +50,10 @@ export default () => {
   return (
     <div className="flex p-3">
       <div
-        className="btn btn-primary btn-large mx-auto"
+        className="btn btn-neutral btn-large mx-auto"
         onClick={() => setIsOpen(true)}
       >
-        Create a tree
+        Create a new tree
       </div>
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
         <div className="modal-box">
@@ -78,7 +78,7 @@ export default () => {
               </div>
             </div>
             {forest ? (
-              <div className="flex flex-row gap-3 text-info">
+              <div className="flex flex-row gap-3 text-accent">
                 <div>Creating a tree costs</div>
                 <TokenInfo
                   mint={forest.voteMint}

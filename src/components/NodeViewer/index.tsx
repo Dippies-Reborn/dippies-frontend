@@ -80,9 +80,9 @@ export default ({ nodeKey }: { nodeKey: PublicKey }) => {
                   </div>
                 )}
               </div>
-              <div className="btn btn-ghost w-fit mx-auto">
+              {/* <div className="btn btn-ghost w-fit mx-auto">
                 <BsThreeDots className="w-12 h-12 m-auto" />
-              </div>
+              </div> */}
             </div>
           ) : null}
           {children ? (
@@ -99,9 +99,9 @@ export default ({ nodeKey }: { nodeKey: PublicKey }) => {
                     )
                   )}
               </div>
-              <div className="btn btn-ghost w-fit mx-auto">
+              {/* <div className="btn btn-ghost w-fit mx-auto">
                 <BsThreeDots className="w-12 h-12 m-auto" />
-              </div>
+              </div> */}
             </div>
           ) : null}
           {parent ? (
