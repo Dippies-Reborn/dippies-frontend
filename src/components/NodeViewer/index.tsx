@@ -12,7 +12,6 @@ import NoteCard from "./NoteCard";
 import { PublicKey } from "@solana/web3.js";
 import React from "react";
 import { TokenInfo } from "../TokenInfo";
-import { formatBn } from "../../utils";
 import useForest from "../../hooks/useForest";
 import useNode from "../../hooks/useNode";
 import useNote from "../../hooks/useNote";

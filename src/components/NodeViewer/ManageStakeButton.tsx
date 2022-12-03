@@ -9,11 +9,10 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { BN } from "bn.js";
 import Decimal from "decimal.js";
-import { DecimalUtil } from "@orca-so/sdk";
 import { GiTwoCoins } from "react-icons/gi";
 import { TokenInfo } from "../TokenInfo";
 import { Transaction } from "@solana/web3.js";
-import { formatBn } from "../../utils";
+import { formatValue } from "../../utils";
 import toast from "react-hot-toast";
 import useForest from "../../hooks/useForest";
 import useProvider from "../../hooks/useProvider";
@@ -59,11 +58,9 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
     }
 
     const finalAmount = add
-      ? new BN(
-          DecimalUtil.toU64(new Decimal(amount), token.decimals).toString()
-        )
+      ? new BN(new Decimal(amount).mul(10 ** (token?.decimals || 6)).toString())
       : new BN(
-          DecimalUtil.toU64(new Decimal(amount), token.decimals).toString()
+          new Decimal(amount).mul(10 ** (token?.decimals || 6)).toString()
         ).neg();
     tx.add(
       await program.methods
@@ -118,8 +115,11 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
             <div className="my-auto text-lg flex flex-row justify-between">
               <div>Your balance:</div>
               <div>
-                {forest && stake ? (
-                  <TokenInfo mint={forest?.voteMint} amount={account?.amount} />
+                {forest && account ? (
+                  <TokenInfo
+                    mint={forest.voteMint}
+                    amount={new BN(account.amount.toString())}
+                  />
                 ) : (
                   "???"
                 )}
@@ -127,9 +127,20 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
             </div>
             <div className="my-auto text-lg flex flex-row justify-between">
               <div>Your stake:</div>
-              <div onClick={() => setAmount(stake ? formatBn(stake.stake) : 0)}>
+              <div
+                onClick={() =>
+                  setAmount(
+                    stake
+                      ? formatValue(
+                          stake.stake,
+                          token?.decimals || 6
+                        ).toNumber()
+                      : 0
+                  )
+                }
+              >
                 {forest && stake ? (
-                  <TokenInfo mint={forest?.voteMint} amount={stake?.stake} />
+                  <TokenInfo mint={forest.voteMint} amount={stake.stake} />
                 ) : (
                   "???"
                 )}
@@ -139,7 +150,7 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
               <div>Total stake:</div>
               <div>
                 {forest && stake ? (
-                  <TokenInfo mint={forest?.voteMint} amount={note?.stake} />
+                  <TokenInfo mint={forest.voteMint} amount={note.stake} />
                 ) : (
                   "???"
                 )}
@@ -153,7 +164,10 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
               />
               <div
                 className={`btn btn-error btn-outline text-4xl ${
-                  !stake || formatBn(stake.stake) <= 0 ? "btn-disabled" : ""
+                  !stake ||
+                  formatValue(stake.stake, token?.decimals || 6).toNumber() <= 0
+                    ? "btn-disabled"
+                    : ""
                 }`}
                 onClick={() => updateStake(false)}
               >
@@ -161,7 +175,12 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
               </div>
               <div
                 className={`btn btn-success btn-outline text-4xl ${
-                  !amount || !account || formatBn(account.amount.toString()) < 0
+                  !amount ||
+                  !account ||
+                  formatValue(
+                    account.amount.toString(),
+                    token?.decimals || 6
+                  ).toNumber() < 0
                     ? "btn-disabled"
                     : ""
                 }`}

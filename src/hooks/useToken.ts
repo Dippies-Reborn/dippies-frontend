@@ -9,7 +9,7 @@ export default function useToken(mint?: PublicKey) {
   const [token, setToken] = useState<Mint>();
 
   const fetchToken = async () => {
-    if (!connection) return;
+    if (!connection || !mint) return;
 
     try {
       const account = await getMint(connection, mint);

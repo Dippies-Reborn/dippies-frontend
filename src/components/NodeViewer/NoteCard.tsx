@@ -1,13 +1,9 @@
-import { DecimalUtil } from "@orca-so/sdk";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ManageStakeButton from "./ManageStakeButton";
 import { Note } from "../../programs/dippiesIndexProtocol";
 import React from "react";
 import { TokenInfo } from "../TokenInfo";
-import { formatBn } from "../../utils";
 import useForest from "../../hooks/useForest";
-import useNote from "../../hooks/useNote";
-import useTokenAccount from "../../hooks/useTokenAccount";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 export default ({ note }: { note: Note }) => {

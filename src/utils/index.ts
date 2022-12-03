@@ -1,4 +1,5 @@
 import { BN } from "@project-serum/anchor";
+import { Decimal } from "decimal.js";
 import { PublicKey } from "@solana/web3.js";
 import { request } from "https";
 
@@ -11,12 +12,16 @@ export const shortAddress = (key: PublicKey) => {
   );
 };
 
-export const formatBn = (n: BN | string) => {
-  if (typeof n === "string") {
-    return Number(n);
-  } else {
-    return n.toNumber();
-  }
+export const formatValue = (n: BN | string, shift: number) => {
+  const value = (() => {
+    if (typeof n === "string") {
+      return Number(n);
+    } else {
+      return n.toNumber();
+    }
+  })();
+
+  return new Decimal(value).div(new Decimal(10 ** shift));
 };
 
 /**

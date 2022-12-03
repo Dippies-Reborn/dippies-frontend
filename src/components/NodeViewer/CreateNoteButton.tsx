@@ -13,7 +13,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { DIPPIES_FOREST } from "../../utils/ids";
 import { Keypair } from "@solana/web3.js";
-import { WebBundlr } from "@bundlr-network/client";
+import { WebBundlr } from "@bundlr-network/client"; // @ts-ignore
 import fileReaderStream from "filereader-stream";
 import { toast } from "react-hot-toast";
 import { useDropzone } from "react-dropzone";

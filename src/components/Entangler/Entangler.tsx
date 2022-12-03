@@ -1,23 +1,17 @@
-import {
-  DIPPIES_DAO_KEY,
-  DIPPIES_KEY,
-  NEW_DIPPIES_MINT,
-  OG_DIPPIES_MINT,
-} from "../../utils/ids";
+import { DIPPIES_DAO_KEY, DIPPIES_KEY, OG_DIPPIES_MINT } from "../../utils/ids";
 import { FaCheckCircle, FaQuestionCircle } from "react-icons/fa";
-import { Nft, toLazyListing } from "@metaplex-foundation/js";
-import { PublicKey, Transaction } from "@solana/web3.js";
 import {
   getEntangledMint,
   getEntangledPair,
 } from "../../programs/entangler/pda";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
-import { PROGRAM_ID as ENTANGLER_ID } from "../../programs/entangler/programId";
 import { EntangledPair } from "../../programs/entangler/accounts/EntangledPair";
 import { EntanglerWrapper } from "../../programs/entangler";
+import { Nft } from "@metaplex-foundation/js";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
 import React from "react";
+import { Transaction } from "@solana/web3.js";
 import { getMint } from "@solana/spl-token";
 import { toast } from "react-hot-toast";
 import { useState } from "react";

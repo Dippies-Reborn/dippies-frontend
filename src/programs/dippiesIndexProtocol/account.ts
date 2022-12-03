@@ -219,7 +219,6 @@ export function getCreateStakeAccounts(
     tokenProgram: TOKEN_PROGRAM_ID,
     associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     systemProgram: SystemProgram.programId,
-    clock: SYSVAR_CLOCK_PUBKEY,
     rent: SYSVAR_RENT_PUBKEY,
   };
 }

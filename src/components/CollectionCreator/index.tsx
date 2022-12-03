@@ -1,4 +1,3 @@
-import { BN, utils } from "@project-serum/anchor";
 import { EntanglerState, EntanglerWrapper } from "../../programs/entangler";
 import {
   Keypair,
@@ -7,16 +6,13 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import {
-  NATIVE_MINT,
-  createSyncNativeInstruction,
-  createTransferInstruction,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
+import { NATIVE_MINT, getAssociatedTokenAddressSync } from "@solana/spl-token";
 import React, { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
+import { BN } from "@project-serum/anchor";
 import { FaWindowClose } from "react-icons/fa";
+import { getEntanglerState } from "../../programs/entangler/pda";
 
 export default () => {
   const { connection } = useConnection();
@@ -30,10 +26,7 @@ export default () => {
   const [key, setKey] = useState<string>();
 
   const fetchState = async () => {
-    const state = await EntanglerState.fetch(
-      connection,
-      EntanglerWrapper.address.entanglerState()
-    );
+    const state = await EntanglerState.fetch(connection, getEntanglerState());
 
     if (state) setEntanglerState(state);
   };
@@ -96,11 +89,11 @@ export default () => {
             lamports: entanglerState.price.toNumber(),
           })
         )
-        .add(
-          createSyncNativeInstruction(
-            getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, true)
-          )
-        )
+        // .add(
+        //   Token.createSyncNativeInstruction(
+        //     getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey, true)
+        //   )
+        // )
         .add(entangler.instruction.createCollection(oneWay))
         .add(
           entangler.instruction.createCollectionEntry(
