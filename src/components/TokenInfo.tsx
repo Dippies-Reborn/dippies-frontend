@@ -17,7 +17,7 @@ export const TokenInfo: FC<Props> = ({ mint, amount }) => {
     <div className="font-bold">
       {token ? (
         <div>
-          {DecimalUtil.fromU64(amount, token.decimals).toString()}{" "}
+          {DecimalUtil.fromU64(amount, token.decimals).toFixed(2)}{" "}
           {shortAddress(mint)}
         </div>
       ) : null}

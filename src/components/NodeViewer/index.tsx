@@ -11,11 +11,14 @@ import NodeCard from "./NodeCard";
 import NoteCard from "./NoteCard";
 import { PublicKey } from "@solana/web3.js";
 import React from "react";
+import { TokenInfo } from "../TokenInfo";
 import { formatBn } from "../../utils";
+import useForest from "../../hooks/useForest";
 import useNode from "../../hooks/useNode";
 import useNote from "../../hooks/useNote";
 
 export default ({ nodeKey }: { nodeKey: PublicKey }) => {
+  const { forest } = useForest();
   const node = useNode(nodeKey);
   const parent = useNode(node?.parent);
   const children = Array(MAX_CHILD_PER_NODE)
@@ -24,8 +27,6 @@ export default ({ nodeKey }: { nodeKey: PublicKey }) => {
   const notes = Array(MAX_NOTES_PER_NODE)
     .fill(0)
     .map((_, i) => useNote(node?.notes[i]));
-
-  console.log(nodeKey.toString(), node, parent, children, notes);
 
   return (
     <div className="flex flex-col w-lg justify-center p-5">
@@ -47,7 +48,11 @@ export default ({ nodeKey }: { nodeKey: PublicKey }) => {
           </div>
           <div className="flex flex-wrap mx-auto gap-2">
             <span>Total stake:</span>
-            <span>{formatBn(node.stake)}</span>
+            {forest ? (
+              <TokenInfo mint={forest.voteMint} amount={node.stake} />
+            ) : (
+              "???"
+            )}
           </div>
           <div className="flex flex-wrap mx-auto gap-2">
             <div className="text-xl">Tags:</div>

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import React from "react";
+import { TokenInfo } from "../TokenInfo";
 import useForest from "../../hooks/useForest";
 
 export default () => {
-  const { trees } = useForest();
+  const { forest, trees } = useForest();
 
   return trees ? (
     <div className="flex flex-col w-lg justify-center">
@@ -13,7 +14,14 @@ export default () => {
           <Link key={tree.title} href={`/dip/node/${tree.rootNode.toString()}`}>
             <div className="bg-base-200 shadow-xl rounded-xl p-5 m-3">
               <div className="text-lg font-bold">{tree.title}</div>
-              <div>Total stake: {tree.stake.toString()}</div>
+              <div>
+                Total stake:{" "}
+                {forest ? (
+                  <TokenInfo mint={forest.voteMint} amount={tree.stake} />
+                ) : (
+                  "???"
+                )}
+              </div>
             </div>
           </Link>
         ))}

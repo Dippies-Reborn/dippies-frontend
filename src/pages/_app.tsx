@@ -6,13 +6,10 @@ import { DipForestProvider } from "../contexts/DipForest";
 import NavBar from "../components/NavigationBar/NavBar";
 import { RegisteredCollectionsProvider } from "../contexts/RegisteredCollection";
 import { Toaster } from "react-hot-toast";
+import { TokensProvider } from "../contexts/Tokens";
 import { UserNftsProvider } from "../contexts/UserNfts";
 import dynamic from "next/dynamic";
-
-const endpoint = "https://api.devnet.solana.com";
-// "https://solana-mainnet.g.alchemy.com/v2/adDYOBvkCEV1a8d5MhmFgxd5tR5KLqq6";
-// "https://solana-mainnet.g.alchemy.com/v2/-Rlnd-xRdEeZJyZZ2APT7J6-VVCvsx2E";
-// "https://rpc.helius.xyz/?api-key=a1036f99-541a-45f6-a650-d5aa465e9a10";
+import useNetwork from "../hooks/useNetwork";
 
 const WalletProvider = dynamic(
   () => import("../contexts/ClientWalletProvider"),
@@ -22,18 +19,21 @@ const WalletProvider = dynamic(
 );
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { endpoint } = useNetwork();
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider>
-        <UserNftsProvider>
-          <RegisteredCollectionsProvider>
-            <DipForestProvider>
-              <NavBar />
-              <Component {...pageProps} />
-              <Toaster />
-            </DipForestProvider>
-          </RegisteredCollectionsProvider>
-        </UserNftsProvider>
+        <TokensProvider>
+          <UserNftsProvider>
+            <RegisteredCollectionsProvider>
+              <DipForestProvider>
+                <NavBar />
+                <Component {...pageProps} />
+                <Toaster />
+              </DipForestProvider>
+            </RegisteredCollectionsProvider>
+          </UserNftsProvider>
+        </TokensProvider>
       </WalletProvider>
     </ConnectionProvider>
   );

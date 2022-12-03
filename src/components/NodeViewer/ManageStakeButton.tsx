@@ -3,18 +3,22 @@ import {
   Note,
   getCreateStakeAccounts,
   getNoteAddress,
-  getStakeAddress,
 } from "../../programs/dippiesIndexProtocol";
 import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { BN } from "bn.js";
+import Decimal from "decimal.js";
+import { DecimalUtil } from "@orca-so/sdk";
 import { GiTwoCoins } from "react-icons/gi";
+import { TokenInfo } from "../TokenInfo";
 import { Transaction } from "@solana/web3.js";
 import { formatBn } from "../../utils";
+import toast from "react-hot-toast";
 import useForest from "../../hooks/useForest";
 import useProvider from "../../hooks/useProvider";
 import useStake from "../../hooks/useStake";
+import useToken from "../../hooks/useToken";
 import useTokenAccount from "../../hooks/useTokenAccount";
 
 export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
@@ -23,6 +27,7 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
   const provider = useProvider();
   const { account, refresh } = useTokenAccount(DIPPIES_TOKEN);
   const { program, forest } = useForest();
+  const { token } = useToken(forest?.voteMint);
   const [isOpen, setIsOpen] = useState(false);
   const [amount, setAmount] = useState<number>();
   const stake = useStake(
@@ -53,7 +58,13 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
       );
     }
 
-    const finalAmount = add ? new BN(amount) : new BN(amount).neg();
+    const finalAmount = add
+      ? new BN(
+          DecimalUtil.toU64(new Decimal(amount), token.decimals).toString()
+        )
+      : new BN(
+          DecimalUtil.toU64(new Decimal(amount), token.decimals).toString()
+        ).neg();
     tx.add(
       await program.methods
         .updateStake(finalAmount)
@@ -70,17 +81,20 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
         .instruction()
     );
 
-    await connection.confirmTransaction(
-      await wallet.sendTransaction(tx, connection, { skipPreflight: true })
-    );
-
-    refresh();
-    setIsOpen(false);
-    setAmount(undefined);
-    onUpdate && onUpdate();
+    try {
+      await connection.confirmTransaction(
+        await wallet.sendTransaction(tx, connection, { skipPreflight: true })
+      );
+      refresh();
+      setIsOpen(false);
+      setAmount(undefined);
+      onUpdate && onUpdate();
+    } catch (e) {
+      toast.error(`Failed udating stake: ${e}`);
+    }
   };
 
-  console.log(stake, account);
+  console.log(stake, account, amount);
 
   return (
     <>
@@ -103,24 +117,39 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
           <div className="flex flex-col gap-3 justify-between bg-base-200 shadow-inner rounded-lg p-3">
             <div className="my-auto text-lg flex flex-row justify-between">
               <div>Your balance:</div>
-              <div>{account?.amount.toString() || 0}</div>
+              <div>
+                {forest && stake ? (
+                  <TokenInfo mint={forest?.voteMint} amount={account?.amount} />
+                ) : (
+                  "???"
+                )}
+              </div>
             </div>
             <div className="my-auto text-lg flex flex-row justify-between">
               <div>Your stake:</div>
               <div onClick={() => setAmount(stake ? formatBn(stake.stake) : 0)}>
-                {stake?.stake.toString() || 0}
+                {forest && stake ? (
+                  <TokenInfo mint={forest?.voteMint} amount={stake?.stake} />
+                ) : (
+                  "???"
+                )}
               </div>
             </div>
             <div className="my-auto text-lg flex flex-row justify-between">
               <div>Total stake:</div>
-              <div>{note.stake.toString() || 0}</div>
+              <div>
+                {forest && stake ? (
+                  <TokenInfo mint={forest?.voteMint} amount={note?.stake} />
+                ) : (
+                  "???"
+                )}
+              </div>
             </div>
             <div className="flex flex-row gap-3 justify-center">
               <input
                 className="input w-full"
                 type="number"
                 onChange={(e) => setAmount(Number(e.target.value))}
-                value={amount}
               />
               <div
                 className={`btn btn-error btn-outline text-4xl ${

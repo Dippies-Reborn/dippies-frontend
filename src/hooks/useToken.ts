@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useConnection } from "@solana/wallet-adapter-react";
 
-export default function useToken(mint: PublicKey) {
+export default function useToken(mint?: PublicKey) {
   const { connection } = useConnection();
   const [token, setToken] = useState<Mint>();
 
