@@ -23,7 +23,7 @@ const TreePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="mt-24">
-        {pubkey ? <NodeViewer node={pubkey} /> : null}
+        {pubkey ? <NodeViewer nodeKey={pubkey} /> : null}
       </div>
     </>
   );

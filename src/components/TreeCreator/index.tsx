@@ -1,18 +1,20 @@
-import { BN, utils } from "@project-serum/anchor";
-import { DIPPIES_ROOT, DIPPIES_TOKEN } from "../../utils/ids";
-import { EntanglerState, EntanglerWrapper } from "../../programs/entangler";
-import { LAMPORTS_PER_SOL, PublicKey, Transaction } from "@solana/web3.js";
-import React, { useEffect, useState } from "react";
+import {
+  MAX_TAG_LENGTH,
+  getCreateTreeAccounts,
+} from "../../programs/dippiesIndexProtocol";
+import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
+import { DIPPIES_FOREST } from "../../utils/ids";
 import { FaWindowClose } from "react-icons/fa";
-import { TreeDeaRoot } from "../../programs/dippiesIndexProtocol";
-import useRoot from "../../hooks/useRoot";
+import { TokenInfo } from "../TokenInfo";
+import toast from "react-hot-toast";
+import useForest from "../../hooks/useForest";
 
 export default () => {
   const { connection } = useConnection();
   const wallet = useWallet();
-  const { root, fetchTrees } = useRoot();
+  const { program, forest } = useForest();
   const [isOpen, setIsOpen] = useState(false);
   const [tag, setTag] = useState<string>();
 
@@ -21,16 +23,28 @@ export default () => {
   };
 
   const handleCreate = async () => {
-    if (!wallet.publicKey || !tag || !root) return;
-    const r = new TreeDeaRoot(wallet.publicKey, root.id, root.voteMint);
+    if (!wallet.publicKey || !tag || !program || !forest) return;
 
-    await wallet.sendTransaction(
-      new Transaction().add(r.instruction.createTree(tag)),
-      connection
-    );
-
-    setIsOpen(false);
-    fetchTrees();
+    try {
+      await connection.confirmTransaction(
+        await program.methods
+          .createTree(tag)
+          .accounts(
+            getCreateTreeAccounts(
+              DIPPIES_FOREST,
+              forest.admin,
+              forest.voteMint,
+              tag,
+              program.provider.publicKey!
+            )!
+          )
+          .rpc({ skipPreflight: true })
+      );
+    } catch (e: any) {
+      toast.error(e.toString());
+    } finally {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -59,9 +73,23 @@ export default () => {
                 className="input input-bordered w-full"
                 onChange={handleTag}
               />
+              <div className="text-end justify-end">
+                {tag?.length || 0} / {MAX_TAG_LENGTH}
+              </div>
             </div>
+            {forest ? (
+              <div className="flex flex-row gap-3 text-info">
+                <div>Creating a tree costs</div>
+                <TokenInfo
+                  mint={forest.voteMint}
+                  amount={forest.treeCreationFee}
+                />
+              </div>
+            ) : null}
             <div
-              className={`btn ${!tag ? "btn-disabled" : ""} w-full`}
+              className={`btn ${
+                !tag || tag.length > MAX_TAG_LENGTH ? "btn-disabled" : ""
+              } w-full`}
               onClick={handleCreate}
             >
               Create a new tree

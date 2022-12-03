@@ -1,24 +1,25 @@
+import {
+  MAX_CHILD_PER_NODE,
+  Node,
+  getAttachNodeAccounts,
+  getCreateNodeAccounts,
+  getNodeAddress,
+} from "../../programs/dippiesIndexProtocol";
 import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { BsNodePlusFill } from "react-icons/bs";
-import { MAX_CHILD_PER_NODE } from "../../programs/dippiesIndexProtocol";
-import { NodeWithKey } from "../../hooks/useTree";
+import { DIPPIES_FOREST } from "../../utils/ids";
 import { Transaction } from "@solana/web3.js";
-import { TreeDeaNode } from "../../programs/dippiesIndexProtocol/node";
 import { toast } from "react-hot-toast";
+import useForest from "../../hooks/useForest";
 import useProvider from "../../hooks/useProvider";
 
-export default ({
-  node,
-  onCreate,
-}: {
-  node: NodeWithKey;
-  onCreate?: () => void;
-}) => {
+export default ({ node, onCreate }: { node: Node; onCreate?: () => void }) => {
   const wallet = useWallet();
   const provider = useProvider();
   const { connection } = useConnection();
+  const { program, forest } = useForest();
   const [isOpen, setIsOpen] = useState(false);
   const [tag, setTag] = useState<string>();
   const [isCreating, setIsCreating] = useState(false);
@@ -28,19 +29,49 @@ export default ({
   };
 
   const handleCreateNode = async () => {
-    if (!provider || !node || !tag) return;
-    const treedeaNode = await TreeDeaNode.fromNode(provider, node);
-
-    if (!treedeaNode) return;
+    if (!provider || !program || !forest || !node || !tag) return;
 
     setIsCreating(true);
 
-    const { ix, child } = treedeaNode.createNode(tag);
-    const tx = new Transaction().add(ix);
+    const nodeKey = getNodeAddress(
+      node.tree,
+      node.parent,
+      node.tags[node.tags.length - 1]
+    );
+    const tx = new Transaction();
+
+    tx.add(
+      await program.methods
+        .createNode(tag)
+        .accounts(
+          getCreateNodeAccounts(
+            DIPPIES_FOREST,
+            node.tree,
+            nodeKey,
+            tag,
+            program.provider.publicKey!
+          )!
+        )
+        .instruction()
+    );
 
     // Auto attach if parent is empty
-    if (node.children.length < MAX_CHILD_PER_NODE)
-      tx.add(child.instruction.attachNode());
+    if (node.children.length < MAX_CHILD_PER_NODE) {
+      tx.add(
+        await program.methods
+          .attachNode()
+          .accounts(
+            getAttachNodeAccounts(
+              DIPPIES_FOREST,
+              node.tree,
+              nodeKey,
+              getNodeAddress(node.tree, nodeKey, tag),
+              program.provider.publicKey!
+            )!
+          )
+          .instruction()
+      );
+    }
 
     try {
       await connection.confirmTransaction(

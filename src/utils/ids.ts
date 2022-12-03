@@ -19,8 +19,12 @@ export const DIPPIES_DAO_KEY = new PublicKey(
   "3h2CFnu8w7NRemnX9ybVeXsXAP3agkMuC1Kz8TnERYUi"
 );
 
-export const DIPPIES_ROOT = new PublicKey(
-  "21WkNFjxuUi3zNA7N2GDJRqmmcHh84vDHo7XczSS2rV8"
+export const DIPPIES_FOREST_ID = new PublicKey(
+  "UuGEwN9aeh676ufphbavfssWVxH7BJCqacq1RYhco8e"
+);
+
+export const DIPPIES_FOREST = new PublicKey(
+  "2eJJ4XgPVAQDWQdZXkwUvZ7ZLHzHmVuqYPEbN84EPknC"
 );
 
 export const DIPPIES_TOKEN = new PublicKey(

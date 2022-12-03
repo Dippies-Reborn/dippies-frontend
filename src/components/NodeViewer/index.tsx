@@ -3,98 +3,29 @@ import {
   MAX_CHILD_PER_NODE,
   MAX_NOTES_PER_NODE,
 } from "../../programs/dippiesIndexProtocol";
-import { PublicKey, Transaction } from "@solana/web3.js";
-import React, { useState } from "react";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import CreateNodeButton from "./CreateNodeButton";
 import CreateNoteButton from "./CreateNoteButton";
 import Link from "next/link";
 import NodeCard from "./NodeCard";
 import NoteCard from "./NoteCard";
-import { TreeDeaNode } from "../../programs/dippiesIndexProtocol/node";
+import { PublicKey } from "@solana/web3.js";
+import React from "react";
 import { formatBn } from "../../utils";
-import { toast } from "react-hot-toast";
 import useNode from "../../hooks/useNode";
-import useProvider from "../../hooks/useProvider";
+import useNote from "../../hooks/useNote";
 
-export default ({ node: nodeKey }: { node: PublicKey }) => {
-  const wallet = useWallet();
-  const provider = useProvider();
-  const { connection } = useConnection();
-  const { node, children, parent, notes, fetchChildren } = useNode(nodeKey);
-  const [tag, setTag] = useState<string>();
-  const [website, setWebsite] = useState<string>();
-  const [image, setImage] = useState<string>();
-  const [description, setDescription] = useState<string>();
-  const [isCreating, setIsCreating] = useState(false);
+export default ({ nodeKey }: { nodeKey: PublicKey }) => {
+  const node = useNode(nodeKey);
+  const parent = useNode(node?.parent);
+  const children = Array(MAX_CHILD_PER_NODE)
+    .fill(0)
+    .map((_, i) => useNode(node?.children[i]));
+  const notes = Array(MAX_NOTES_PER_NODE)
+    .fill(0)
+    .map((_, i) => useNote(node?.notes[i]));
 
-  const handleTag: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setTag(e.target.value);
-  };
-  const handleWebsite: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setWebsite(e.target.value);
-  };
-  const handleImage: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setImage(e.target.value);
-  };
-  const handleDescription: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setDescription(e.target.value);
-  };
-
-  const handleCreateNode = async () => {
-    if (!provider || !node || !tag) return;
-    const treedeaNode = await TreeDeaNode.fromNode(provider, node);
-
-    if (!treedeaNode) return;
-
-    setIsCreating(true);
-
-    const { ix, child } = treedeaNode.createNode(tag);
-    const tx = new Transaction().add(ix);
-
-    // Auto attach if parent is empty
-    if (node.children.length < MAX_CHILD_PER_NODE)
-      tx.add(child.instruction.attachNode());
-
-    try {
-      await connection.confirmTransaction(
-        await wallet.sendTransaction(tx, connection, { skipPreflight: true })
-      );
-      fetchChildren();
-    } catch (e: any) {
-      toast.error(e.toString());
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  const handleCreateNote = async () => {
-    if (!provider || !node || !website || !image || !description) return;
-    const treedeaNode = await TreeDeaNode.fromNode(provider, node);
-
-    if (!treedeaNode) return;
-
-    setIsCreating(true);
-
-    const { ix, note } = treedeaNode.createNote(website, image, description);
-    const tx = new Transaction().add(ix);
-
-    // Auto attach if parent is empty
-    if (node.notes.length < MAX_CHILD_PER_NODE)
-      tx.add(note.instruction.attachNote());
-
-    try {
-      await connection.confirmTransaction(
-        await wallet.sendTransaction(tx, connection, { skipPreflight: true })
-      );
-      fetchChildren();
-    } catch (e: any) {
-      toast.error(e.toString());
-    } finally {
-      setIsCreating(false);
-    }
-  };
+  console.log(nodeKey.toString(), node, parent, children, notes);
 
   return (
     <div className="flex flex-col w-lg justify-center p-5">
@@ -127,50 +58,46 @@ export default ({ node: nodeKey }: { node: PublicKey }) => {
             ))}
           </div>
           {notes ? (
-            <>
+            <div className="flex flex-col gap-3">
               <div className="divider text-lg">Notes</div>
               <div className="flex flex-wrap mx-auto">
-                {notes.map((note) => (
-                  <NoteCard key={note.key.toString()} note={note} />
-                ))}
                 {node.children.length === 0 ? (
-                  Array(MAX_NOTES_PER_NODE - notes.length)
-                    .fill(0)
-                    .map((_, i) => (
+                  notes.map((note, i) =>
+                    note ? (
+                      <NoteCard key={note.tags.join().toString()} note={note} />
+                    ) : (
                       <CreateNoteButton key={`create-note-${i}`} node={node} />
-                    ))
+                    )
+                  )
                 ) : (
-                  <div>Can't create notes on nodes with children</div>
+                  <div className="font-bold">
+                    Can't create notes on nodes with children
+                  </div>
                 )}
               </div>
               <div className="btn btn-ghost w-fit mx-auto">
                 <BsThreeDots className="w-12 h-12 m-auto" />
               </div>
-            </>
+            </div>
           ) : null}
           {children ? (
-            <>
+            <div className="flex flex-col gap-3">
               <div className="divider text-lg">Children</div>
               <div className="flex flex-wrap mx-auto">
                 {children
-                  .sort((a, b) => (a.stake.gt(b.stake) ? -1 : 1))
-                  .map((child) => (
-                    <NodeCard key={child.key.toString()} node={child} />
-                  ))}
-                {Array(MAX_CHILD_PER_NODE - children.length)
-                  .fill(0)
-                  .map((_, i) => (
-                    <CreateNodeButton
-                      key={`create-node-${i}`}
-                      node={node}
-                      onCreate={fetchChildren}
-                    />
-                  ))}
+                  .sort((a, b) => (a!.stake.gt(b!.stake) ? -1 : 1))
+                  .map((child, i) =>
+                    child ? (
+                      <NodeCard key={child.tags.join()} node={child} />
+                    ) : (
+                      <CreateNodeButton key={`create-node-${i}`} node={node} />
+                    )
+                  )}
               </div>
               <div className="btn btn-ghost w-fit mx-auto">
                 <BsThreeDots className="w-12 h-12 m-auto" />
               </div>
-            </>
+            </div>
           ) : null}
           {parent ? (
             <>

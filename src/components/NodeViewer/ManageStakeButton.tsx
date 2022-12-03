@@ -1,66 +1,86 @@
-import React, { useState } from "react";
+import { DIPPIES_FOREST, DIPPIES_TOKEN } from "../../utils/ids";
 import {
-  StakeAccount,
-  TreeDeaStakeAccount,
+  Note,
+  getCreateStakeAccounts,
+  getNoteAddress,
+  getStakeAddress,
 } from "../../programs/dippiesIndexProtocol";
+import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import useNote, { NoteWithKey, StakeAccountWithKey } from "../../hooks/useNote";
 
 import { BN } from "bn.js";
-import { DIPPIES_TOKEN } from "../../utils/ids";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import { GiTwoCoins } from "react-icons/gi";
-import Image from "next/image";
-import Link from "next/link";
 import { Transaction } from "@solana/web3.js";
 import { formatBn } from "../../utils";
+import useForest from "../../hooks/useForest";
 import useProvider from "../../hooks/useProvider";
+import useStake from "../../hooks/useStake";
 import useTokenAccount from "../../hooks/useTokenAccount";
 
-export default ({
-  note,
-  onUpdate,
-}: {
-  note: NoteWithKey;
-  onUpdate?: () => {};
-}) => {
+export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
   const wallet = useWallet();
   const { connection } = useConnection();
   const provider = useProvider();
   const { account, refresh } = useTokenAccount(DIPPIES_TOKEN);
+  const { program, forest } = useForest();
   const [isOpen, setIsOpen] = useState(false);
   const [amount, setAmount] = useState<number>();
-  const { userStake, fetchUserStake } = useNote(note);
+  const stake = useStake(
+    wallet.publicKey ? getNoteAddress(note.tree, note.id) : undefined
+  );
 
   const updateStake = async (add: boolean) => {
-    if (!provider || !wallet.publicKey || !amount) return;
-    const stake = await TreeDeaStakeAccount.fromNote(provider, note);
+    if (!provider || !wallet.publicKey || !program || !forest || !amount)
+      return;
 
     const tx = new Transaction();
 
     if (!stake) {
-      return;
-    }
-
-    if (!(await StakeAccount.fetch(connection, stake.stakeAccount))) {
-      tx.add(stake.instruction.createStake());
+      tx.add(
+        await program.methods
+          .createStake()
+          .accounts(
+            getCreateStakeAccounts(
+              DIPPIES_FOREST,
+              forest.voteMint,
+              note.tree,
+              note.parent,
+              getNoteAddress(note.tree, note.id),
+              wallet.publicKey
+            )!
+          )
+          .instruction()
+      );
     }
 
     const finalAmount = add ? new BN(amount) : new BN(amount).neg();
-    tx.add(stake.instruction.updateStake(finalAmount));
+    tx.add(
+      await program.methods
+        .updateStake(finalAmount)
+        .accounts(
+          getCreateStakeAccounts(
+            DIPPIES_FOREST,
+            forest.voteMint,
+            note.tree,
+            note.parent,
+            getNoteAddress(note.tree, note.id),
+            wallet.publicKey
+          )!
+        )
+        .instruction()
+    );
 
     await connection.confirmTransaction(
       await wallet.sendTransaction(tx, connection, { skipPreflight: true })
     );
 
     refresh();
-    fetchUserStake();
     setIsOpen(false);
     setAmount(undefined);
     onUpdate && onUpdate();
   };
 
-  console.log(userStake, account);
+  console.log(stake, account);
 
   return (
     <>
@@ -87,12 +107,8 @@ export default ({
             </div>
             <div className="my-auto text-lg flex flex-row justify-between">
               <div>Your stake:</div>
-              <div
-                onClick={() =>
-                  setAmount(userStake ? formatBn(userStake.stake) : 0)
-                }
-              >
-                {userStake?.stake.toString() || 0}
+              <div onClick={() => setAmount(stake ? formatBn(stake.stake) : 0)}>
+                {stake?.stake.toString() || 0}
               </div>
             </div>
             <div className="my-auto text-lg flex flex-row justify-between">
@@ -108,9 +124,7 @@ export default ({
               />
               <div
                 className={`btn btn-error btn-outline text-4xl ${
-                  !userStake || formatBn(userStake.stake) <= 0
-                    ? "btn-disabled"
-                    : ""
+                  !stake || formatBn(stake.stake) <= 0 ? "btn-disabled" : ""
                 }`}
                 onClick={() => updateStake(false)}
               >

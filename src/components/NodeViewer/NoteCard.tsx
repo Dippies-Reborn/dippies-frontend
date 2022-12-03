@@ -1,12 +1,12 @@
-import useNote, { NoteWithKey } from "../../hooks/useNote";
-
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ManageStakeButton from "./ManageStakeButton";
+import { Note } from "../../programs/dippiesIndexProtocol";
 import React from "react";
 import { formatBn } from "../../utils";
+import useNote from "../../hooks/useNote";
 import { useWallet } from "@solana/wallet-adapter-react";
 
-export default ({ note }: { note: NoteWithKey }) => {
+export default ({ note }: { note: Note }) => {
   const wallet = useWallet();
   return (
     <div className="w-64 bg-base-200 rounded-xl shadow-xl m-3 flex flex-col gap-2">

@@ -1,30 +1,30 @@
 import { AiFillFileAdd, AiFillFileImage } from "react-icons/ai";
+import {
+  MAX_NOTES_PER_NODE,
+  MAX_TAG_LENGTH,
+  Node,
+  getAttachNoteAccounts,
+  getCreateNoteAccounts,
+  getNodeAddress,
+  getNoteAddress,
+} from "../../programs/dippiesIndexProtocol";
 import React, { useCallback, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
-import { BN } from "bn.js";
-import { MAX_CHILD_PER_NODE } from "../../programs/dippiesIndexProtocol";
-import { NodeWithKey } from "../../hooks/useTree";
-import { Transaction } from "@solana/web3.js";
-import { TreeDeaNode } from "../../programs/dippiesIndexProtocol/node";
+import { DIPPIES_FOREST } from "../../utils/ids";
+import { Keypair } from "@solana/web3.js";
 import { WebBundlr } from "@bundlr-network/client";
-// @ts-ignore
 import fileReaderStream from "filereader-stream";
 import { toast } from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
-import useProvider from "../../hooks/useProvider";
+import useForest from "../../hooks/useForest";
 
-export default ({
-  node,
-  onCreate,
-}: {
-  node: NodeWithKey;
-  onCreate?: () => void;
-}) => {
+export default ({ node, onCreate }: { node: Node; onCreate?: () => void }) => {
   const wallet = useWallet();
-  const provider = useProvider();
   const { connection } = useConnection();
+  const { program, forest } = useForest();
   const [isOpen, setIsOpen] = useState(false);
+  const [title, setTitle] = useState<string>();
   const [website, setWebsite] = useState<string>();
   const [image, setImage] = useState<string>();
   const [uploadedImage, setUploadedImage] = useState<string>();
@@ -32,8 +32,7 @@ export default ({
   const [description, setDescription] = useState<string>();
   const [isCreating, setIsCreating] = useState(false);
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
-    if (!provider) return;
+    if (!connection) return;
 
     if (acceptedFiles.length > 1) {
       toast.error("Upload only a single image");
@@ -44,13 +43,13 @@ export default ({
       "https://devnet.bundlr.network", // "https://node1.bundlr.network",
       "solana",
       wallet,
-      { providerUrl: provider.connection.rpcEndpoint }
+      { providerUrl: connection.rpcEndpoint }
     );
 
     // Fund the bundlr account
     try {
       const fundRes = await bundler.fund(
-        await bundler.getPrice(acceptedFiles[0].size)
+        await bundler.getPrice(Math.round(acceptedFiles[0].size * 1.1))
       );
       console.log(fundRes);
     } catch (e: any) {
@@ -91,6 +90,9 @@ export default ({
     accept: { "application/octet-stream": [".jpg", ".png"] },
   });
 
+  const handleTitle: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setTitle(e.target.value);
+  };
   const handleWebsite: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setWebsite(e.target.value);
   };
@@ -103,31 +105,61 @@ export default ({
 
   const handleCreateNote = async () => {
     if (
-      !provider ||
+      !program ||
+      !program.provider.publicKey ||
+      !forest ||
       !node ||
+      !title ||
       !website ||
       !(image || uploadedImage) ||
       !description
     )
       return;
     const img = uploadedImage || image;
-    const treedeaNode = await TreeDeaNode.fromNode(provider, node);
-
-    if (!treedeaNode) return;
 
     setIsCreating(true);
 
-    const { ix, note } = treedeaNode.createNote(website, img!, description);
-    const tx = new Transaction().add(ix);
-
-    // Auto attach if parent is empty
-    if (node.notes.length < MAX_CHILD_PER_NODE)
-      tx.add(note.instruction.attachNote());
+    const id = Keypair.generate().publicKey;
+    const noteKey = getNoteAddress(node.tree, id);
+    const nodeKey = getNodeAddress(
+      node.tree,
+      node.parent,
+      node.tags[node.tags.length - 1]
+    );
 
     try {
-      await connection.confirmTransaction(
-        await wallet.sendTransaction(tx, connection)
-      );
+      await program.methods
+        .createNote(id, title, website, img!, description)
+        .accounts(
+          getCreateNoteAccounts(
+            DIPPIES_FOREST,
+            node.tree,
+            nodeKey,
+            id,
+            program.provider.publicKey
+          )!
+        )
+        .postInstructions(
+          // Auto attach if parent is empty
+          node.notes.length < MAX_NOTES_PER_NODE
+            ? [
+                await program.methods
+                  .attachNote()
+                  .accounts(
+                    getAttachNoteAccounts(
+                      DIPPIES_FOREST,
+                      node.tree,
+                      nodeKey,
+                      noteKey,
+                      program.provider.publicKey
+                    )!
+                  )
+                  .instruction(),
+              ]
+            : []
+        )
+        .rpc();
+
       onCreate && onCreate();
       setWebsite(undefined);
       setImage(undefined);
@@ -162,6 +194,18 @@ export default ({
             ✕
           </div>
           <div className="text-2xl font-bold">Create a note</div>
+          <div className="bg-base-200 p-3 rounded-xl shadow-inner">
+            <div className="text-lg font-bold">Title</div>
+            <div className="text-sm">The title of this note.</div>
+            <input
+              className="input input-bordered w-full"
+              placeholder="Dippies Index Protocol"
+              onChange={handleTitle}
+            />
+            <div className="text-end justify-end">
+              {title?.length || 0} / {MAX_TAG_LENGTH}
+            </div>
+          </div>
           <div className="bg-base-200 p-3 rounded-xl shadow-inner">
             <div className="text-lg font-bold">Website</div>
             <div className="text-sm">Website the note points to.</div>

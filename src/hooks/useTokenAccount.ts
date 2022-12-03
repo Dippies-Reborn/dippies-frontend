@@ -6,9 +6,9 @@ import {
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 
-import { DIPPIES_TOKEN } from "./../utils/ids";
 import { Note } from "../programs/dippiesIndexProtocol";
 import { PublicKey } from "@solana/web3.js";
+import useToken from "./useToken";
 
 export interface NoteWithKey extends Note {
   key: PublicKey;
@@ -16,8 +16,15 @@ export interface NoteWithKey extends Note {
 
 export default function useTokenAccount(mint: PublicKey) {
   const wallet = useAnchorWallet();
+  const { token } = useToken(mint);
   const { connection } = useConnection();
   const [userAccount, setUserAccount] = useState<Account>();
+  const value =
+    userAccount && token
+      ? userAccount.amount.toLocaleString("fullwide", {
+          maximumFractionDigits: token.decimals as any,
+        })
+      : 0;
 
   const fetchUserAccount = async () => {
     if (!connection || !wallet?.publicKey) return;
@@ -34,5 +41,9 @@ export default function useTokenAccount(mint: PublicKey) {
     fetchUserAccount();
   }, [wallet?.publicKey, mint]);
 
-  return { account: userAccount, refresh: fetchUserAccount };
+  return {
+    account: userAccount,
+    refresh: fetchUserAccount,
+    value,
+  };
 }
