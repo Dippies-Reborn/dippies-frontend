@@ -1,7 +1,8 @@
+import React, { useState } from "react";
+
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ManageStakeButton from "./ManageStakeButton";
 import { Note } from "../../programs/dippiesIndexProtocol";
-import React from "react";
 import { TokenInfo } from "../TokenInfo";
 import useForest from "../../hooks/useForest";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -9,8 +10,11 @@ import { useWallet } from "@solana/wallet-adapter-react";
 export default ({ note }: { note: Note }) => {
   const wallet = useWallet();
   const { forest } = useForest();
+  const [open, setOpen] = useState(false);
+  console.log(note);
+
   return (
-    <div className="w-64 bg-base-200 rounded-xl shadow-xl m-3 flex flex-col gap-2">
+    <div className="w-72 bg-base-200 rounded-xl shadow-xl m-3 flex flex-col gap-2">
       <div>
         <img
           className="w-full rounded-t-xl"
@@ -20,7 +24,19 @@ export default ({ note }: { note: Note }) => {
       </div>
       <div className="p-3 pt-0">
         <div className="flex flex-col gap-3">
-          <div className="divider text-lg font-bold">{note.description}</div>
+          <div
+            className={`collapse collapse-arrow ${open ? "collapse-open" : ""}`}
+            tabIndex={0}
+          >
+            <input type="checkbox" />
+            <div
+              className="collapse-title"
+              onClick={() => setOpen((old) => !old)}
+            >
+              <div className="divider text-lg font-bold">{note.title}</div>
+            </div>
+            <div className="collapse-content">{note.description}</div>
+          </div>
           <div className="flex flex-row justify-between">
             <div className="font-bold my-auto">Total stake:</div>
             <div className="flex flex- gap-1">

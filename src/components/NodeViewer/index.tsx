@@ -64,7 +64,7 @@ export default ({ nodeKey }: { nodeKey: PublicKey }) => {
           {notes ? (
             <div className="flex flex-col gap-3">
               <div className="divider text-lg">Notes</div>
-              <div className="flex flex-wrap mx-auto">
+              <div className="flex flex-wrap mx-auto justify-center">
                 {node.children.length === 0 ? (
                   notes.map((note, i) =>
                     note ? (
@@ -87,7 +87,7 @@ export default ({ nodeKey }: { nodeKey: PublicKey }) => {
           {children ? (
             <div className="flex flex-col gap-3">
               <div className="divider text-lg">Children</div>
-              <div className="flex flex-wrap mx-auto">
+              <div className="flex flex-wrap mx-auto justify-center">
                 {children
                   .sort((a, b) => (a!.stake.gt(b!.stake) ? -1 : 1))
                   .map((child, i) =>

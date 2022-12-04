@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import useLocalStorage from "./useLocalStorage";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 type Networks = "Mainnet" | "Devnet" | "Localnet";
 interface Network {
@@ -19,7 +21,7 @@ const networks: Network[] = [
     slug: "mainnet-beta",
   },
   {
-    endpoint: "http://api.devnet.solana.com",
+    endpoint: "https://api.devnet.solana.com",
     name: "Devnet",
     slug: "devnet",
   },
@@ -28,10 +30,18 @@ const networks: Network[] = [
 
 export default function useNetwork() {
   const [network, setNetwork] = useLocalStorage(`dippies_network`, networks[0]);
+  const wallet = useWallet();
 
   const changeNetwork = (networkName: Networks) => {
     setNetwork(networks.find((e) => e.name === networkName) || networks[0]);
   };
+
+  useEffect(() => {
+    console.log("");
+    if (wallet.connected) {
+      wallet.connect();
+    }
+  }, [network]);
 
   return { ...network, changeNetwork, networks };
 }
