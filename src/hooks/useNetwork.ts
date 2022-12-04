@@ -16,7 +16,7 @@ interface Network {
 const networks: Network[] = [
   {
     endpoint:
-      "https://solana-mainnet.g.alchemy.com/v2/iAi3pvCx6buRGu6rtRQV5MhCzKQ74qI1",
+      "https://rpc.helius.xyz/?api-key=a1036f99-541a-45f6-a650-d5aa465e9a10",
     name: "Mainnet",
     slug: "mainnet-beta",
   },
@@ -37,7 +37,6 @@ export default function useNetwork() {
   };
 
   useEffect(() => {
-    console.log("");
     if (wallet.connected) {
       wallet.connect();
     }

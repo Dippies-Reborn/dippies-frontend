@@ -21,7 +21,6 @@ const WalletProvider = dynamic(
 
 const Providers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { endpoint } = useNetwork();
-  console.log(endpoint);
 
   return (
     <ConnectionProvider endpoint={endpoint}>{children}</ConnectionProvider>
