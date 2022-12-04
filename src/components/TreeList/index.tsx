@@ -11,7 +11,10 @@ export default () => {
       <div className="divider text-2xl font-bold p-5 ">All trees</div>
       <div className="flex flex-wrap mx-auto justify-center">
         {Object.values(trees).map((tree) => (
-          <Link key={tree.title} href={`/dip/node/${tree.rootNode.toString()}`}>
+          <Link
+            key={tree.title}
+            href={`/dip/node?key=${tree.rootNode.toString()}`}
+          >
             <div className="bg-base-200 shadow-xl rounded-xl p-5 m-3">
               <div className="text-lg font-bold">{tree.title}</div>
               <div className="flex flex-row gap-5 justify-between">
