@@ -7,7 +7,7 @@ import verifiedCollection from "../../constants/verified_collections.json";
 export default ({ collection }: { collection: RegisteredCollection }) => {
   console.log("Collection", collection);
   return (
-    <Link href={"/collection/" + collection.key}>
+    <Link href={"/collection?id=" + collection.key}>
       <div
         key={collection.address.toString()}
         className={`m-2 static flex flex-col w-32 sm:w-48 rounded-lg shadow-xl bg-neutral`}

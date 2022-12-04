@@ -15,6 +15,8 @@ const TreePage: NextPage = () => {
     } catch {}
   }, [router]);
 
+  console.log(router);
+
   return (
     <>
       <Head>

@@ -33,7 +33,7 @@ export default ({ note }: { note: Note }) => {
               className="collapse-title"
               onClick={() => setOpen((old) => !old)}
             >
-              <div className="divider text-lg font-bold">{note.title}</div>
+              <div className="text-lg font-bold">{note.title}</div>
             </div>
             <div className="collapse-content">{note.description}</div>
           </div>
