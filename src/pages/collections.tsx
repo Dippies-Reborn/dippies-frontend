@@ -11,7 +11,7 @@ const Collections: NextPage = () => {
         <meta name="description" content="A path forward" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="mt-24">
+      <div className="mt-2">
         <CollectionCreator />
         <CollectionList />
       </div>

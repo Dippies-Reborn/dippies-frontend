@@ -13,8 +13,8 @@ const DIPHome: NextPage = () => {
         <meta name="description" content="A path forward" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex flex-col gap-10 mt-24">
-        <div className="flex flex-col gap-3 bg-base-300 p-5 rounded-2xl shadow-2xl max-w-md mx-auto text-center">
+      <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-3 bg-base-200 mt-5 p-5 rounded-2xl shadow-2xl max-w-md mx-auto text-center">
           <div className="text-3xl font-bold">Dippies Index Protocol</div>
           <div className="">
             A hierarchical token-curated registry built on Solana

@@ -30,7 +30,7 @@ module.exports = {
     styled: true,
     themes: [
       // first one will be the default theme
-      "dark",
+      "autumn",
     ],
     base: true,
     utils: true,

@@ -11,7 +11,9 @@ const Home: NextPage = () => {
         <meta name="description" content="A path forward" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Hero heading="Dippies Club" message="Dippies to the nippies" />
+      <div className="absolute top-0 -z-10 h-screen w-full">
+        <Hero heading="Dippies Club" message="Dippies to the nippies" />
+      </div>
     </>
   );
 };
