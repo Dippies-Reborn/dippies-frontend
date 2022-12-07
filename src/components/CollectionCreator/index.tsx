@@ -121,7 +121,7 @@ export default () => {
         Create a registered collection
       </div>
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
-        <div className="modal-box">
+        <div className="modal-box bg-focus">
           <div className="flex flex-row justify-between">
             <div className="text-xl font-bold my-auto">Creator</div>
             <div className="btn btn-ghost" onClick={() => setIsOpen(false)}>
@@ -131,7 +131,7 @@ export default () => {
           <div className="form flex flex-col gap-2">
             <div className="">
               <div className="font-bold">Original collection mint</div>
-              <div className="text-sm text-neutral-content">
+              <div className="text-sm text-focus-content">
                 You can find it in the "collection" field of your token's
                 metadata.
               </div>
@@ -142,7 +142,7 @@ export default () => {
             </div>
             <div className="">
               <div className="font-bold">Royalties earner</div>
-              <div className="text-sm text-neutral-content">
+              <div className="text-sm text-focus-content">
                 The wallet that will receive royalties.
               </div>
               <input
@@ -152,7 +152,7 @@ export default () => {
             </div>
             <div className="">
               <div className="font-bold">Royalties</div>
-              <div className="text-sm text-neutral-content">
+              <div className="text-sm text-focus-content">
                 The percentage taken for royalties on each trade.
               </div>
               <input
@@ -164,7 +164,7 @@ export default () => {
 
             <div className="">
               <div className="font-bold">Reversable</div>
-              <div className="text-sm text-neutral-content">
+              <div className="text-sm text-focus-content">
                 Whether it's possible to convert entangled tokens back to the
                 original collection.
               </div>
@@ -177,7 +177,7 @@ export default () => {
             </div>
             <div className="">
               <div className="font-bold">Registry key</div>
-              <div className="text-sm text-neutral-content">
+              <div className="text-sm text-focus-content">
                 A human readable key in snake case (written_like_this).
               </div>
               <input
@@ -186,7 +186,7 @@ export default () => {
               />
             </div>
             <div
-              className={`btn ${
+              className={`btn btn-primary ${
                 !mint || !royalties || !percentage || !key ? "btn-disabled" : ""
               } w-full`}
               onClick={handleCreate}

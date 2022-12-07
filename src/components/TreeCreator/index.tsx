@@ -50,7 +50,7 @@ export default () => {
   return (
     <div className="flex p-3">
       <div
-        className="btn btn-neutral btn-large mx-auto"
+        className="btn btn-focus btn-large mx-auto"
         onClick={() => setIsOpen(true)}
       >
         Create a new tree
@@ -66,7 +66,7 @@ export default () => {
           <div className="form flex flex-col gap-2">
             <div className="">
               <div className="font-bold">Root's title</div>
-              <div className="text-sm text-neutral-content">
+              <div className="text-sm text-focus-content">
                 The main topic of this tree.
               </div>
               <input

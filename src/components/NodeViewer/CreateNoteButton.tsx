@@ -186,7 +186,7 @@ export default ({ node, onCreate }: { node: Node; onCreate?: () => void }) => {
         </div>
       </div>
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
-        <div className="modal-box flex flex-col p-5 gap-5 max-w-3xl">
+        <div className="modal-box bg-focus flex flex-col p-5 gap-5 max-w-3xl">
           <div
             className="btn btn-sm btn-circle fixed right-2 top-2 absolute"
             onClick={() => setIsOpen(false)}
@@ -229,7 +229,7 @@ export default ({ node, onCreate }: { node: Node; onCreate?: () => void }) => {
                 />
                 <div
                   {...getRootProps()}
-                  className={`border-dashed border-neutral-content border rounded-lg p-4 my-2`}
+                  className={`border-dashed border-focus-content border rounded-lg p-4 my-2`}
                 >
                   <input {...getInputProps()} />
                   <div className="text-center">

@@ -102,6 +102,17 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
+"@dippies-club/battle-royale-program@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@dippies-club/battle-royale-program/-/battle-royale-program-1.0.2.tgz#1ab1ba0018ae6f8abdb836a37337bd800fcc2127"
+  integrity sha512-87TfvC+D5CISoPPPkgE4hlzwChIg9GzWCrqkE/8P77p2+Iw+Xrv9njJDxz68hSkqbCBGkzOc52qGX/7W+vg3tg==
+  dependencies:
+    "@metaplex-foundation/mpl-token-metadata" "^2.2.2"
+    "@project-serum/anchor" "^0.25.0"
+    "@solana/spl-token" "^0.2.0"
+    keccak256 "^1.0.6"
+    merkletreejs "^0.2.32"
+
 "@eslint/eslintrc@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.3.0.tgz#29f92c30bb3e771e4a2048c95fa6855392dfac4f"
@@ -793,6 +804,19 @@
     "@solana/web3.js" "^1.35.1"
     bs58 "^4.0.1"
 
+"@metaplex-foundation/mpl-token-metadata@^2.2.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@metaplex-foundation/mpl-token-metadata/-/mpl-token-metadata-2.5.2.tgz#ec84464e2bf65bf491abdc71c3882e5973dd9978"
+  integrity sha512-lAjQjj2gGtyLq8MOkp4tWZSC5DK9NWgPd3EoH0KQ9gMs3sKIJRik0CBaZg+JA0uLwzkiErY2Izus4vbWtRADJQ==
+  dependencies:
+    "@metaplex-foundation/beet" "^0.7.1"
+    "@metaplex-foundation/beet-solana" "^0.4.0"
+    "@metaplex-foundation/cusper" "^0.0.2"
+    "@solana/spl-token" "^0.3.6"
+    "@solana/web3.js" "^1.66.2"
+    bn.js "^5.2.0"
+    debug "^4.3.4"
+
 "@metaplex-foundation/mpl-token-metadata@^2.3.3", "@metaplex-foundation/mpl-token-metadata@^2.5.1":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@metaplex-foundation/mpl-token-metadata/-/mpl-token-metadata-2.5.1.tgz#0958d49136a102da299de5b2b2b73831196f7593"
@@ -1263,6 +1287,15 @@
     "@solana/web3.js" "^1.32.0"
     start-server-and-test "^1.14.0"
 
+"@solana/spl-token@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.3.6.tgz#35473ad2ed71fe91e5754a2ac72901e1b8b26a42"
+  integrity sha512-P9pTXjDIRvVbjr3J0mCnSamYqLnICeds7IoH1/Ro2R9OBuOHdp5pqKZoscfZ3UYrgnCWUc1bc9M2m/YPHjw+1g==
+  dependencies:
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/buffer-layout-utils" "^0.2.0"
+    buffer "^6.0.3"
+
 "@solana/wallet-adapter-alpha@^0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-alpha/-/wallet-adapter-alpha-0.1.5.tgz#766bfa5a07f388e3f0676fac1b5eabf08e907380"
@@ -1688,6 +1721,27 @@
   version "1.66.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.66.2.tgz#80b43c5868b846124fe3ebac7d3943930c3fa60c"
   integrity sha512-RyaHMR2jGmaesnYP045VLeBGfR/gAW3cvZHzMFGg7bkO+WOYOYp1nEllf0/la4U4qsYGKCsO9eEevR5fhHiVHg==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    "@noble/ed25519" "^1.7.0"
+    "@noble/hashes" "^1.1.2"
+    "@noble/secp256k1" "^1.6.3"
+    "@solana/buffer-layout" "^4.0.0"
+    bigint-buffer "^1.1.5"
+    bn.js "^5.0.0"
+    borsh "^0.7.0"
+    bs58 "^4.0.1"
+    buffer "6.0.1"
+    fast-stable-stringify "^1.0.0"
+    jayson "^3.4.4"
+    node-fetch "2"
+    rpc-websockets "^7.5.0"
+    superstruct "^0.14.2"
+
+"@solana/web3.js@^1.66.2":
+  version "1.70.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.70.0.tgz#14ad207f431861397db85921aad8df4e8374e7c8"
+  integrity sha512-HwdI9LaHaszfpzgxJI44iP68mJWUeqK1TeSheKQsGkH5zlVyGWGmim50MyDWu2vXiuL8Akf2xEMSrDYyLordgg==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@noble/ed25519" "^1.7.0"
@@ -5390,6 +5444,15 @@ just-diff@^5.0.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/just-diff/-/just-diff-5.1.1.tgz#8da6414342a5ed6d02ccd64f5586cbbed3146202"
   integrity sha512-u8HXJ3HlNrTzY7zrYYKjNEfBlyjqhdBkoyTVdjtn7p02RJD5NvR8rIClzeGA7t+UYP1/7eAkWNLU0+P3QrEqKQ==
+
+keccak256@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/keccak256/-/keccak256-1.0.6.tgz#dd32fb771558fed51ce4e45a035ae7515573da58"
+  integrity sha512-8GLiM01PkdJVGUhR1e6M/AvWnSqYS0HaERI+K/QtStGDGlSTx2B1zTqZk4Zlqu5TxHJNTxWAdP9Y+WI50OApUw==
+  dependencies:
+    bn.js "^5.2.0"
+    buffer "^6.0.3"
+    keccak "^3.0.2"
 
 keccak@^3.0.0, keccak@^3.0.2:
   version "3.0.2"

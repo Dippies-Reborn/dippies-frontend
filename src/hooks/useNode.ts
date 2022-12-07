@@ -5,7 +5,7 @@ import { useMemo } from "react";
 const useNode = (nodeKey?: PublicKey) => {
   const { nodes, fetchNode } = useForest();
   const node = useMemo(() => {
-    console.log("memo node", nodeKey);
+    console.log("memo node", nodeKey?.toString());
 
     if (!nodeKey) return;
 

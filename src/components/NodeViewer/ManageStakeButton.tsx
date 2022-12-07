@@ -3,6 +3,7 @@ import {
   Note,
   getCreateStakeAccounts,
   getNoteAddress,
+  getUpdateStakeAccounts,
 } from "../../programs/dippiesIndexProtocol";
 import React, { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -66,7 +67,7 @@ export default ({ note, onUpdate }: { note: Note; onUpdate?: () => {} }) => {
       await program.methods
         .updateStake(finalAmount)
         .accounts(
-          getCreateStakeAccounts(
+          getUpdateStakeAccounts(
             DIPPIES_FOREST,
             forest.voteMint,
             note.tree,

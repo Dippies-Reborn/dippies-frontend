@@ -97,25 +97,28 @@ export default ({ node, onCreate }: { node: Node; onCreate?: () => void }) => {
         </div>
       </div>
       <div className={`modal ${isOpen ? "modal-open" : ""}`}>
-        <div className="modal-box flex flex-col gap-2 max-w-3xl bg-base-300 align-center p-3 rounded-xl shadow-xl mx-auto">
+        <div className="modal-box flex flex-col gap-2 max-w-3xl align-center p-3 rounded-xl shadow-xl mx-auto">
           <div
             className="btn btn-sm btn-circle fixed right-2 top-2 absolute"
             onClick={() => setIsOpen(false)}
           >
             ✕
           </div>
-          <div className="text-xl font-bold">Tag</div>
-          <div>
-            <div className="text-sm">The tag of the child node.</div>
-            <div className="text-sm">
-              A node inherits all his tags from its parent
+          <div className="text-2xl font-bold">Create a node</div>
+          <div className="bg-base-200 p-3 rounded-xl shadow-inner">
+            <div className="text-xl font-bold">Tag</div>
+            <div>
+              <div className="text-sm">The tag of the child node.</div>
+              <div className="text-sm">
+                A node inherits all his tags from its parent
+              </div>
             </div>
+            <input
+              className="input input-bordered w-full"
+              placeholder="Tag..."
+              onChange={handleTag}
+            />
           </div>
-          <input
-            className="input input-bordered w-full"
-            placeholder="Tag..."
-            onChange={handleTag}
-          />
           <div
             className={`btn btn-primary ${tag ? "" : "btn-disabled"} ${
               isCreating ? "btn-disabled loading" : ""
