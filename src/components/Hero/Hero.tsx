@@ -13,7 +13,7 @@ const Hero = ({ heading, message }: Props) => {
       <div className="flex flex-col p-5 z-[2] mt-[-5rem] gap-1 bg-base-100 rounded-xl">
         <h2 className="text-5xl font-bold">{heading}</h2>
         <p className="py-2 text-xl">{message}</p>
-        <Link href="/collection/dippies">
+        <Link href="/collection?key=dippies">
           <div className="btn btn-lg btn-primary flex flex-row gap-2 w-fit mx-auto text-2xl font-bold text-center p-4">
             Entangle Dippies
           </div>
